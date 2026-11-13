@@ -1,0 +1,6 @@
+/storage/evidence/*
+!/storage/evidence/.gitkeep
+/storage/faces/*
+!/storage/faces/.gitkeep
+/uploads/listings/*
+!/uploads/listings/.gitkeep
