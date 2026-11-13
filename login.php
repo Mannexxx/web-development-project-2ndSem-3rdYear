@@ -1,31 +1,39 @@
 <?php
-/** @var ?string $error */
-/** @var string $email */
-/** @var string $next */
-?>
-<section class="wrap page-head">
-    <p class="eyebrow">WELCOME BACK</p>
-    <h1 class="h1">Sign in to Bantayan Marketplace.</h1>
-    <p class="lead">Message sellers, post products and leave ratings. You can always keep browsing as a guest.</p>
-</section>
-<section class="wrap pad-bottom">
-    <div class="panel narrow">
-        <h2 class="h2">Sign in</h2>
-        <?php if ($error): ?><div class="flash flash-error" role="alert"><?= e($error) ?></div><?php endif; ?>
-        <form method="post" action="<?= e(url('login.php')) ?>" class="form" novalidate>
-            <?= csrf_field() ?>
-            <input type="hidden" name="next" value="<?= e($next) ?>">
-            <div class="field">
-                <label for="email">Email address</label>
-                <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" value="<?= e($email) ?>" required>
-            </div>
-            <div class="field">
-                <label for="password">Password</label>
-                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
-            </div>
-            <button class="btn btn-primary" type="submit">Sign in</button>
-        </form>
-        <p class="small muted top-gap">New here? <a class="link" href="<?= e(url('register.php' . ($next !== '' ? '?next=' . rawurlencode($next) : ''))) ?>">Create a profile</a></p>
-        <p><a class="btn" href="<?= e(url('index.php')) ?>">Continue browsing as a guest</a></p>
-    </div>
-</section>
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/config.php';
+
+use App\Repository\TownRepository;
+use App\Repository\UserRepository;
+use App\Service\AuthService;
+
+$next = safe_next($_POST['next'] ?? $_GET['next'] ?? '', '');
+
+if (current_user() !== null) {
+    redirect($next !== '' ? $next : 'index.php');
+}
+
+$error = null;
+$email = '';
+if (is_post()) {
+    verify_csrf();
+    $email = trim((string) ($_POST['email'] ?? ''));
+    $auth = new AuthService(repo(UserRepository::class), repo(TownRepository::class));
+    $result = $auth->attempt($email, (string) ($_POST['password'] ?? ''));
+    if ($result['ok']) {
+        AuthService::signIn((int) $result['user_id']);
+        $user = current_user();
+        if ($next !== '') {
+            redirect($next);
+        }
+        redirect(is_admin($user) ? 'admin/index.php' : 'index.php');
+    }
+    $error = $result['error'];
+}
+
+render('login', ['error' => $error, 'email' => $email, 'next' => $next], [
+    'title' => 'Sign in · ' . APP_NAME,
+    'tab' => 'profile',
+    'footer' => ['text' => 'Bantayan Marketplace', 'slashes' => true, 'links' => [['Privacy & verification', 'privacy.php'], ['Community guidelines', 'guidelines.php'], ['Contact admin', 'support.php']]],
+]);

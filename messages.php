@@ -1,109 +1,173 @@
 <?php
-/** @var array $list */
-/** @var ?array $current */
-/** @var array $messages */
-/** @var ?array $deal */
-/** @var ?array $myReview */
-/** @var int $uid */
 
-$isSeller = $current !== null && (int) $current['seller_id'] === $uid;
-$otherName = $current === null ? '' : ($isSeller ? full_name($current, 'buyer_') : full_name($current, 'seller_'));
-$otherFirst = $current === null ? '' : ($isSeller ? $current['buyer_firstname'] : $current['seller_firstname']);
-?>
-<section class="wrap page-head">
-    <p class="eyebrow">YOUR INBOX</p>
-    <h1 class="h1">Messages</h1>
-</section>
+declare(strict_types=1);
 
-<section class="wrap pad-bottom">
-    <div class="inbox<?= $current ? ' has-thread' : '' ?>">
-        <aside class="inbox-list panel">
-            <?php if (!$list): ?>
-                <p class="muted">No conversations yet. Open a listing and tap “Message seller”.</p>
-                <a class="btn btn-primary" href="<?= e(url('index.php')) ?>">Browse listings</a>
-            <?php endif; ?>
-            <?php foreach ($list as $c):
-                $mine = (int) $c['seller_id'] === $uid;
-                $name = $mine ? full_name($c, 'buyer_') : full_name($c, 'seller_');
-                ?>
-                <a class="inbox-item<?= $current && (int) $current['id'] === (int) $c['id'] ? ' active' : '' ?>" href="<?= e(url('messages.php?c=' . (int) $c['id'])) ?>">
-                    <span class="inbox-name"><?= e($name) ?><?php if ((int) $c['unread'] > 0): ?> <span class="badge"><?= (int) $c['unread'] ?></span><?php endif; ?></span>
-                    <span class="inbox-listing"><?= e($c['listing_title']) ?> · <?= $mine ? 'You’re selling' : 'You’re buying' ?></span>
-                    <span class="inbox-last muted small"><?= e(excerpt((string) ($c['last_body'] ?? 'No messages yet'), 60)) ?></span>
-                </a>
-            <?php endforeach; ?>
-        </aside>
+require_once __DIR__ . '/config.php';
 
-        <div class="thread panel">
-            <?php if ($current === null): ?>
-                <p class="muted">Select a conversation to read it.</p>
-            <?php else: ?>
-                <a class="m-only link" href="<?= e(url('messages.php')) ?>">‹ All messages</a>
-                <div class="panel-head">
-                    <h2 class="h2"><?= e($otherName) ?></h2>
-                    <span class="eyebrow"><?= $isSeller ? 'BUYER' : 'SELLER' ?></span>
-                </div>
-                <p class="small muted">About <a class="link" href="<?= e(url('listing.php?id=' . (int) $current['listing_id'])) ?>"><?= e($current['listing_title']) ?></a> · <?= e(money($current['listing_price'])) ?></p>
+use App\Database;
+use App\Repository\ConversationRepository;
+use App\Repository\DealRepository;
+use App\Repository\ListingRepository;
+use App\Repository\NotificationRepository;
 
-                <?php foreach ($messages as $m): $mine = (int) $m['sender_id'] === $uid; ?>
-                    <div class="bubble <?= $mine ? 'bubble-me' : 'bubble-them' ?>">
-                        <span class="who"><?= $mine ? 'You · ' . ($isSeller ? 'Seller' : 'Buyer') : e($otherFirst) . ' · ' . ($isSeller ? 'Buyer' : 'Seller') ?> <span class="when"><?= e(time_ago($m['created_at'])) ?></span></span>
-                        <?= nl2br(e($m['body'])) ?>
-                    </div>
-                <?php endforeach; ?>
-                <?php if (!$messages): ?><p class="muted">No messages yet.</p><?php endif; ?>
+$conversations = repo(ConversationRepository::class);
+$listings = repo(ListingRepository::class);
+$deals = repo(DealRepository::class);
+$notes = repo(NotificationRepository::class);
 
-                <form class="compose" method="post" action="<?= e(url('messages.php')) ?>">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="action" value="send">
-                    <input type="hidden" name="conversation_id" value="<?= (int) $current['id'] ?>">
-                    <input type="hidden" name="return" value="<?= e('messages.php?c=' . (int) $current['id']) ?>">
-                    <div class="field grow">
-                        <label for="body">Your message</label>
-                        <input id="body" name="body" type="text" maxlength="2000" placeholder="Type a message…" autocomplete="off" required>
-                    </div>
-                    <button class="btn btn-primary" type="submit">Send</button>
-                </form>
+/** Only allow going back to the listing page or a conversation. */
+function message_return(?string $ret, string $fallback): string
+{
+    $ret = (string) $ret;
+    return preg_match('/^(listing\.php\?id=\d+|messages\.php\?c=\d+)(#[a-z\-]+)?$/', $ret) ? $ret : $fallback;
+}
 
-                <hr class="rule">
-                <?php if ($deal !== null): ?>
-                    <div class="done-box">
-                        <p><strong>Deal completed</strong> · <?= e(date_pretty($deal['completed_at'])) ?></p>
-                        <?php if ($myReview !== null): ?>
-                            <p class="muted">You rated <?= e($otherFirst) ?> <span class="stars"><?= e(stars($myReview['rating'])) ?></span><?= $myReview['comment'] ? ' · “' . e($myReview['comment']) . '”' : '' ?></p>
-                        <?php else: ?>
-                            <form method="post" action="<?= e(url('messages.php')) ?>" class="form">
-                                <?= csrf_field() ?>
-                                <input type="hidden" name="action" value="review">
-                                <input type="hidden" name="deal_id" value="<?= (int) $deal['id'] ?>">
-                                <input type="hidden" name="return" value="<?= e('messages.php?c=' . (int) $current['id']) ?>">
-                                <div class="field">
-                                    <label for="rating">Rate <?= e($otherFirst) ?></label>
-                                    <select id="rating" name="rating" required>
-                                        <option value="">Choose a rating</option>
-                                        <?php for ($i = 5; $i >= 1; $i--): ?><option value="<?= $i ?>"><?= $i ?> — <?= e(stars($i)) ?></option><?php endfor; ?>
-                                    </select>
-                                </div>
-                                <div class="field">
-                                    <label for="comment">Comment (optional)</label>
-                                    <input id="comment" name="comment" maxlength="500" placeholder="How was the deal?">
-                                </div>
-                                <button class="btn btn-primary" type="submit" data-confirm-click="Submit this rating? You can only rate this completed deal once.">Submit rating</button>
-                            </form>
-                        <?php endif; ?>
-                    </div>
-                <?php elseif ($isSeller && $current['listing_status'] === 'approved'): ?>
-                    <form method="post" action="<?= e(url('messages.php')) ?>" data-confirm="Mark “<?= e($current['listing_title']) ?>” as sold to <?= e($otherName) ?>? This closes the listing.">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="action" value="sold">
-                        <input type="hidden" name="conversation_id" value="<?= (int) $current['id'] ?>">
-                        <button class="btn" type="submit">Mark as sold to <?= e($otherFirst) ?></button>
-                        <p class="small muted">After a completed deal, buyers and sellers can rate one another.</p>
-                    </form>
-                <?php elseif ($current['listing_status'] === 'sold'): ?>
-                    <p class="small muted">This item was sold to someone else.</p>
-                <?php endif; ?>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
+if (is_post()) {
+    verify_csrf();
+    $action = (string) ($_POST['action'] ?? '');
+
+    if ($action === 'send') {
+        $me = require_verified('send messages');
+        $body = trim((string) ($_POST['body'] ?? ''));
+        $convId = (int) ($_POST['conversation_id'] ?? 0);
+        $listingId = (int) ($_POST['listing_id'] ?? 0);
+        $fallback = $convId > 0 ? 'messages.php?c=' . $convId : 'listing.php?id=' . $listingId;
+        $return = message_return($_POST['return'] ?? '', $fallback);
+
+        if ($body === '' || mb_strlen($body) > 2000) {
+            flash('error', 'Please type a message (up to 2000 characters).');
+            redirect($return);
+        }
+
+        $conv = null;
+        if ($convId > 0) {
+            $conv = $conversations->find($convId);
+            if ($conv === null || ((int) $conv['buyer_id'] !== (int) $me['id'] && (int) $conv['seller_id'] !== (int) $me['id'])) {
+                abort(403, 'You are not part of this conversation.');
+            }
+        } else {
+            $listing = $listings->find($listingId);
+            if ($listing === null || $listing['status'] !== 'approved') {
+                flash('error', 'This listing is no longer available for messages.');
+                redirect('index.php');
+            }
+            if ((int) $listing['seller_id'] === (int) $me['id']) {
+                flash('error', 'You cannot message yourself about your own listing.');
+                redirect($return);
+            }
+            $conv = $conversations->findByListingBuyer($listingId, (int) $me['id']);
+            if ($conv === null) {
+                try {
+                    $newId = $conversations->create($listingId, (int) $me['id']);
+                } catch (PDOException) {
+                    $newId = 0; // created by a double click a moment ago
+                }
+                $conv = $newId > 0 ? $conversations->find($newId) : $conversations->findByListingBuyer($listingId, (int) $me['id']);
+            }
+            if ($conv === null) {
+                abort(500, 'Could not start the conversation.');
+            }
+        }
+
+        $conversations->addMessage((int) $conv['id'], (int) $me['id'], $body);
+        flash('success', 'Message sent.');
+        redirect($convId > 0 ? $return : message_return($_POST['return'] ?? '', 'messages.php?c=' . (int) $conv['id']));
+    }
+
+    if ($action === 'sold') {
+        $me = require_verified('mark items as sold');
+        $conv = $conversations->find((int) ($_POST['conversation_id'] ?? 0));
+        if ($conv === null || (int) $conv['seller_id'] !== (int) $me['id']) {
+            abort(403, 'Only the seller can mark an item as sold.');
+        }
+        $back = 'messages.php?c=' . (int) $conv['id'];
+        if ($conv['listing_status'] !== 'approved') {
+            flash('error', 'This listing is not live, so it cannot be marked as sold.');
+            redirect($back);
+        }
+        $pdo = Database::getConnection();
+        $pdo->beginTransaction();
+        try {
+            $deals->create((int) $conv['listing_id'], (int) $conv['buyer_id'], (int) $me['id']);
+            $listings->setStatus((int) $conv['listing_id'], 'sold');
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            flash('error', 'Could not complete the deal. Please try again.');
+            redirect($back);
+        }
+        $notes->create((int) $conv['buyer_id'], 'deal', 'Deal completed', 'Rate your experience with ' . $me['firstname'] . ' for "' . $conv['listing_title'] . '".', $back);
+        flash('success', 'Marked as sold. You can now rate each other.');
+        redirect($back);
+    }
+
+    if ($action === 'review') {
+        $me = require_verified('leave a rating');
+        $deal = $deals->find((int) ($_POST['deal_id'] ?? 0));
+        $rating = (int) ($_POST['rating'] ?? 0);
+        $comment = trim((string) ($_POST['comment'] ?? ''));
+        $back = message_return($_POST['return'] ?? '', 'account.php');
+        if ($deal === null || ((int) $deal['buyer_id'] !== (int) $me['id'] && (int) $deal['seller_id'] !== (int) $me['id'])) {
+            abort(403, 'You can only rate a deal you took part in.');
+        }
+        if ($rating < 1 || $rating > 5) {
+            flash('error', 'Please choose a rating from 1 to 5 stars.');
+            redirect($back);
+        }
+        if (mb_strlen($comment) > 500) {
+            flash('error', 'Please keep your comment under 500 characters.');
+            redirect($back);
+        }
+        if ($deals->reviewBy((int) $deal['id'], (int) $me['id']) !== null) {
+            flash('info', 'You already rated this deal.');
+            redirect($back);
+        }
+        $isBuyer = (int) $deal['buyer_id'] === (int) $me['id'];
+        $revieweeId = $isBuyer ? (int) $deal['seller_id'] : (int) $deal['buyer_id'];
+        try {
+            $deals->addReview((int) $deal['id'], (int) $me['id'], $revieweeId, $isBuyer ? 'buyer' : 'seller', $rating, $comment);
+        } catch (PDOException) {
+            flash('info', 'You already rated this deal.');
+            redirect($back);
+        }
+        $notes->create($revieweeId, 'review', 'You received a new rating', $me['firstname'] . ' rated you ' . $rating . ' out of 5.', 'seller.php?id=' . $revieweeId);
+        flash('success', 'Thank you for rating this deal.');
+        redirect($back);
+    }
+
+    redirect('messages.php');
+}
+
+$me = require_login('Please sign in to see your messages.');
+$uid = (int) $me['id'];
+
+$current = null;
+$messages = [];
+$deal = null;
+$myReview = null;
+$currentId = (int) ($_GET['c'] ?? 0);
+if ($currentId > 0) {
+    $current = $conversations->find($currentId);
+    if ($current === null || ((int) $current['buyer_id'] !== $uid && (int) $current['seller_id'] !== $uid)) {
+        abort(404, 'That conversation does not exist.');
+    }
+    $conversations->markRead($currentId, $uid);
+    $messages = $conversations->messages($currentId);
+    $found = $deals->findByListing((int) $current['listing_id']);
+    if ($found !== null && (int) $found['buyer_id'] === (int) $current['buyer_id']) {
+        $deal = $found;
+        $myReview = $deals->reviewBy((int) $deal['id'], $uid);
+    }
+}
+
+render('messages', [
+    'list' => $conversations->forUser($uid),
+    'current' => $current,
+    'messages' => $messages,
+    'deal' => $deal,
+    'myReview' => $myReview,
+    'uid' => $uid,
+], [
+    'title' => 'Messages · ' . APP_NAME,
+    'tab' => 'messages',
+]);
