@@ -51,15 +51,12 @@ final class UploadService
         return $this->store($file, 'uploads/listings', self::IMAGE_TYPES[$mime]);
     }
 
-<<<<<<< HEAD
     public function saveProfilePicture(array $file): string
     {
         [$mime] = $this->validate($file, self::IMAGE_TYPES, true);
         return $this->store($file, 'uploads/profiles', self::IMAGE_TYPES[$mime]);
     }
 
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     /**
      * Evidence goes into storage/ which the web server never serves directly.
      *

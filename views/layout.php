@@ -17,29 +17,19 @@ $chrome = $layout['chrome'];
     <meta name="csrf" content="<?= e(csrf_token()) ?>">
     <meta name="base" content="<?= e(BASE_PATH) ?>">
     <title><?= e($layout['title']) ?></title>
-<<<<<<< HEAD
     <link rel="icon" type="image/svg+xml" href="<?= e(asset('logo/bantayan-marketplace-logo.svg')) ?>">
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
 </head>
 <body class="chrome-<?= e($chrome) ?> <?= e($layout['body_class']) ?><?= $layout['hide_tabs'] ? '' : ' has-tabs' ?>">
-<<<<<<< HEAD
 <?php if (!$layout['hide_header']): ?>
     <?php if ($chrome === 'admin'): ?>
         <?php require VIEW_PATH . '/partials/admin-header.php'; ?>
     <?php else: ?>
         <?php require VIEW_PATH . '/partials/site-header.php'; ?>
     <?php endif; ?>
-=======
-<?php if ($chrome === 'admin'): ?>
-    <?php require VIEW_PATH . '/partials/admin-header.php'; ?>
-<?php else: ?>
-    <?php require VIEW_PATH . '/partials/site-header.php'; ?>
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 <?php endif; ?>
 
 <?php if ($flashes): ?>

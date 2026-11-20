@@ -37,19 +37,10 @@ $latestReviews = $deals->reviewsFor((int) $listing['seller_id'], 'seller', 1);
 $state = 'ready';
 if ($isOwner) {
     $state = 'owner';
-<<<<<<< HEAD
 } elseif ($listing['status'] !== 'approved' || (int) $listing['stock'] <= 0) {
     $state = 'unavailable';
 } elseif ($me === null) {
     $state = 'guest';
-=======
-} elseif ($listing['status'] !== 'approved') {
-    $state = 'unavailable';
-} elseif ($me === null) {
-    $state = 'guest';
-} elseif (!is_verified($me) && !is_admin($me)) {
-    $state = 'unverified';
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 }
 
 $conversation = null;

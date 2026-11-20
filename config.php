@@ -9,7 +9,6 @@ declare(strict_types=1);
  * XAMPP defaults are used below. Change them only if your MySQL setup differs.
  */
 
-<<<<<<< HEAD
 // Provider credentials belong in the ignored config.local.php or environment variables.
 $providerConfigPath = __DIR__ . '/config.local.php';
 $providerConfig = is_file($providerConfigPath) ? require $providerConfigPath : [];
@@ -57,22 +56,6 @@ define('GOOGLE_REDIRECT_URI', $providerSetting('GOOGLE_REDIRECT_URI', 'google_re
 if (is_file(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
-=======
-// ---- Database (XAMPP default: user "root", empty password) -----------------
-const DB_HOST = 'localhost';
-const DB_PORT = 3306;
-const DB_NAME = 'bantayan_market';
-const DB_USER = 'root';
-const DB_PASS = '';
-
-// ---- Application ------------------------------------------------------------
-const APP_NAME  = 'Bantayan Marketplace';
-const APP_DEBUG = true;                 // set to false on a public server
-const APP_TZ    = 'Asia/Manila';
-const MAX_PHOTOS = 8;
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB per file
-const ASSET_VERSION = '1';
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 date_default_timezone_set(APP_TZ);
 mb_internal_encoding('UTF-8');
@@ -121,10 +104,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-<<<<<<< HEAD
         'secure' => isset($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off',
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         'httponly' => true,
         'samesite' => 'Lax',
     ]);

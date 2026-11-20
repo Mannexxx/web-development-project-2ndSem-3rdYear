@@ -1,9 +1,5 @@
 # Uploaded photos are images only: never run scripts from this folder
-<<<<<<< HEAD
 Options -Indexes
-=======
-Options -Indexes -ExecCGI
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 <FilesMatch "\.(php|phtml|phar|php[0-9])$">
     <IfModule mod_authz_core.c>
         Require all denied

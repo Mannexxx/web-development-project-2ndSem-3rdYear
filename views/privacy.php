@@ -6,20 +6,9 @@
     <h2 class="h2">What we store</h2>
     <p>Your name, email address, town and a securely hashed password (we never store your password itself). We also store your listings, messages, ratings, reports and support requests so the marketplace can work.</p>
 
-<<<<<<< HEAD
     <h2 class="h2">Email authentication</h2>
     <p>Email is the primary authentication and verification method for accounts. Existing phone details are not used to sign in.</p>
 
-=======
-    <h2 class="h2" id="verification">Face verification</h2>
-    <p>Face verification is optional but needed to message sellers, sell and leave ratings. It exists to reduce impersonation.</p>
-    <ul>
-        <li>We ask for your consent before the camera starts, and record when you gave it.</li>
-        <li>During verification the page captures three camera images. One of them is kept as your verification image in a private folder that the web server does not serve. The others are discarded.</li>
-        <li>The image is never shown to other members. Other members only see a “Face verified” badge.</li>
-        <li>You can ask the admin team to review or delete your verification data from Customer service.</li>
-    </ul>
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
     <h2 class="h2">Browsing</h2>
     <p>Guests can browse without an account. To suggest listings, we keep which listings you opened during your visit, linked to a random session key, and to your account if you are signed in.</p>

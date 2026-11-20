@@ -44,13 +44,8 @@ final class Database
             echo '<!doctype html><meta charset="utf-8"><title>Database error</title>';
             echo '<body style="font-family:system-ui,sans-serif;max-width:640px;margin:60px auto;padding:0 20px;line-height:1.5">';
             echo '<h1>Cannot connect to the database</h1>';
-<<<<<<< HEAD
             echo '<p>Check that the configured database server is available and that you imported '
                 . '<code>database.sql</code> into database <code>' . htmlspecialchars(DB_NAME) . '</code>.</p>';
-=======
-            echo '<p>Make sure MySQL is running in the XAMPP Control Panel and that you imported '
-                . '<code>database/schema.sql</code> in phpMyAdmin (database name: <code>' . htmlspecialchars(DB_NAME) . '</code>).</p>';
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             if (APP_DEBUG) {
                 echo '<p><small>Details: ' . htmlspecialchars($e->getMessage()) . '</small></p>';
             }

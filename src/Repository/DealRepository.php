@@ -25,7 +25,6 @@ final class DealRepository extends Repository
         return $this->one('SELECT id, listing_id, buyer_id, seller_id, completed_at FROM deals WHERE listing_id = ?', [$listingId]);
     }
 
-<<<<<<< HEAD
     public function findByListingBuyer(int $listingId, int $buyerId): ?array
     {
         return $this->one(
@@ -35,8 +34,6 @@ final class DealRepository extends Repository
         );
     }
 
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     /** Deals a user took part in, with the other party and whether the user already rated. */
     public function forUser(int $userId): array
     {
@@ -62,7 +59,6 @@ final class DealRepository extends Repository
 
     public function addReview(int $dealId, int $reviewerId, int $revieweeId, string $reviewerRole, int $rating, ?string $comment): int
     {
-<<<<<<< HEAD
         $this->db->beginTransaction();
         try {
             $reviewId = $this->insert(
@@ -85,12 +81,6 @@ final class DealRepository extends Repository
             }
             throw $e;
         }
-=======
-        return $this->insert(
-            'INSERT INTO reviews (deal_id, reviewer_id, reviewee_id, reviewer_role, rating, comment, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [$dealId, $reviewerId, $revieweeId, $reviewerRole, $rating, $comment !== '' ? $comment : null, now()]
-        );
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     }
 
     /**

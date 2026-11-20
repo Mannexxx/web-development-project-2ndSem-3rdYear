@@ -16,11 +16,7 @@ if (!csrf_valid()) {
     json_response(['ok' => false, 'message' => 'Your session expired. Please reload the page.'], 419);
 }
 $user = current_user();
-<<<<<<< HEAD
 if ($user === null) {
-=======
-if ($user === null || (!is_verified($user) && !is_admin($user))) {
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     json_response(['ok' => false, 'message' => 'Please sign in with a verified profile.'], 401);
 }
 

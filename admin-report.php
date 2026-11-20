@@ -1,11 +1,7 @@
 <?php
-<<<<<<< HEAD
 
 declare(strict_types=1);
 
 // Legacy report action. Use the canonical admin workspace for report decisions.
 require_once __DIR__ . '/config.php';
 redirect('admin/index.php?tab=reports');
-=======
-declare(strict_types=1);session_start();require_once __DIR__.'/config.php';if(empty($_SESSION['user'])){header('Location: login.php?next=admin.php');exit;}if(($_SESSION['user']['role']??'')!=='admin'){http_response_code(403);exit('Admin access only.');}$decision=(string)($_POST['decision']??'');if(!in_array($decision,['action_taken','dismissed'],true)){http_response_code(400);exit('Invalid decision.');}$pdo=App\Database::getConnection();$id=(int)($_POST['report_id']??0);$pdo->prepare('UPDATE reports SET status=?,resolved_at=NOW() WHERE id=?')->execute([$decision,$id]);$pdo->prepare('INSERT INTO moderation_actions(report_id,admin_id,action) VALUES(?,?,?)')->execute([$id,$_SESSION['user']['id'],$decision==='dismissed'?'report_dismissed':'removed']);header('Location: admin.php');exit;
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073

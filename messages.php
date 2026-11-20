@@ -9,29 +9,18 @@ use App\Repository\ConversationRepository;
 use App\Repository\DealRepository;
 use App\Repository\ListingRepository;
 use App\Repository\NotificationRepository;
-<<<<<<< HEAD
 use App\Repository\PurchaseRepository;
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 $conversations = repo(ConversationRepository::class);
 $listings = repo(ListingRepository::class);
 $deals = repo(DealRepository::class);
 $notes = repo(NotificationRepository::class);
 
-<<<<<<< HEAD
 /** Only allow going back to a local listing, conversation, or purchase section. */
 function message_return(?string $ret, string $fallback): string
 {
     $ret = (string) $ret;
     return preg_match('/^(listing\.php\?id=\d+|messages\.php\?c=\d+|purchases\.php)(#[a-z\-]+)?$/', $ret) ? $ret : $fallback;
-=======
-/** Only allow going back to the listing page or a conversation. */
-function message_return(?string $ret, string $fallback): string
-{
-    $ret = (string) $ret;
-    return preg_match('/^(listing\.php\?id=\d+|messages\.php\?c=\d+)(#[a-z\-]+)?$/', $ret) ? $ret : $fallback;
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 }
 
 if (is_post()) {
@@ -93,13 +82,10 @@ if (is_post()) {
             abort(403, 'Only the seller can mark an item as sold.');
         }
         $back = 'messages.php?c=' . (int) $conv['id'];
-<<<<<<< HEAD
         if (repo(PurchaseRepository::class)->hasOrderForListingBuyer((int) $conv['listing_id'], (int) $conv['buyer_id'])) {
             flash('error', 'This buyer has an order for the item. The buyer manages receipt and review in My Purchases.');
             redirect($back);
         }
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         if ($conv['listing_status'] !== 'approved') {
             flash('error', 'This listing is not live, so it cannot be marked as sold.');
             redirect($back);
@@ -145,7 +131,6 @@ if (is_post()) {
         $revieweeId = $isBuyer ? (int) $deal['seller_id'] : (int) $deal['buyer_id'];
         try {
             $deals->addReview((int) $deal['id'], (int) $me['id'], $revieweeId, $isBuyer ? 'buyer' : 'seller', $rating, $comment);
-<<<<<<< HEAD
         } catch (PDOException $e) {
             if ((int) ($e->errorInfo[1] ?? 0) === 1062) {
                 flash('info', 'You already rated this deal.');
@@ -153,10 +138,6 @@ if (is_post()) {
                 error_log('Deal review failed for deal ' . (int) $deal['id'] . ': ' . $e->getMessage());
                 flash('error', 'Your rating could not be saved. Please try again.');
             }
-=======
-        } catch (PDOException) {
-            flash('info', 'You already rated this deal.');
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             redirect($back);
         }
         $notes->create($revieweeId, 'review', 'You received a new rating', $me['firstname'] . ' rated you ' . $rating . ' out of 5.', 'seller.php?id=' . $revieweeId);
@@ -174,10 +155,7 @@ $current = null;
 $messages = [];
 $deal = null;
 $myReview = null;
-<<<<<<< HEAD
 $hasPurchase = false;
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 $currentId = (int) ($_GET['c'] ?? 0);
 if ($currentId > 0) {
     $current = $conversations->find($currentId);
@@ -186,7 +164,6 @@ if ($currentId > 0) {
     }
     $conversations->markRead($currentId, $uid);
     $messages = $conversations->messages($currentId);
-<<<<<<< HEAD
     $hasPurchase = repo(PurchaseRepository::class)->hasOrderForListingBuyer(
         (int) $current['listing_id'],
         (int) $current['buyer_id']
@@ -199,9 +176,6 @@ if ($currentId > 0) {
         || (int) $found['buyer_id'] !== (int) $current['buyer_id'])) {
         $found = null;
     }
-=======
-    $found = $deals->findByListing((int) $current['listing_id']);
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     if ($found !== null && (int) $found['buyer_id'] === (int) $current['buyer_id']) {
         $deal = $found;
         $myReview = $deals->reviewBy((int) $deal['id'], $uid);
@@ -214,10 +188,7 @@ render('messages', [
     'messages' => $messages,
     'deal' => $deal,
     'myReview' => $myReview,
-<<<<<<< HEAD
     'hasPurchase' => $hasPurchase,
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     'uid' => $uid,
 ], [
     'title' => 'Messages · ' . APP_NAME,

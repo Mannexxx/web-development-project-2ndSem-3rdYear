@@ -2,7 +2,6 @@
 (function () {
   'use strict';
 
-<<<<<<< HEAD
   var flashContainer = document.querySelector('.flashes');
   if (flashContainer) {
     var header = document.querySelector('.admin-header, .site-header, .m-appbar');
@@ -25,8 +24,6 @@
     }, 5000);
   });
 
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   // Filters: submit the form as soon as a select changes.
   document.querySelectorAll('select[data-autosubmit]').forEach(function (sel) {
     sel.addEventListener('change', function () { sel.form && sel.form.submit(); });
@@ -102,7 +99,6 @@
       if (!window.confirm(f.dataset.confirm)) { e.preventDefault(); }
     });
   });
-<<<<<<< HEAD
 
   // Password visibility controls on auth pages.
   document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
@@ -150,6 +146,4 @@
       });
     });
   }
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 })();

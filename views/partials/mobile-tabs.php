@@ -7,10 +7,7 @@ $tabs = [
     'explore' => ['Explore', 'index.php'],
     'sell' => ['Sell', 'sell.php'],
     'messages' => ['Messages', 'messages.php'],
-<<<<<<< HEAD
     'purchases' => ['Purchases', $me ? 'purchases.php' : 'login.php'],
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     'profile' => ['Profile', $me ? 'account.php' : 'login.php'],
 ];
 ?>

@@ -6,7 +6,6 @@
 /** @var array $tickets */
 /** @var array $notifications */
 /** @var int $unreadNotes */
-<<<<<<< HEAD
 /** @var array $towns */
 /** @var array $profileErrors */
 /** @var string $section */
@@ -109,16 +108,6 @@
     <div class="btn-row">
         <a class="btn" href="<?= e(url('account.php?section=edit-profile')) ?>">Edit profile</a>
         <?php if (!is_admin($me)): ?><a class="btn" href="<?= e(url('account.php?section=settings')) ?>">Account settings</a><?php endif; ?>
-=======
-?>
-<section class="wrap page-head">
-    <p class="eyebrow">YOUR PROFILE</p>
-    <h1 class="h1"><?= e(full_name($me)) ?></h1>
-    <p class="lead"><?= e($me['email']) ?> · <?= e(town_label($me['town_name'])) ?> · Member since <?= e(date_pretty($me['created_at'])) ?></p>
-    <div class="btn-row">
-        <?php if (is_verified($me)): ?><span class="tag">Face-verified</span>
-        <?php elseif (!is_admin($me)): ?><a class="btn btn-primary" href="<?= e(url('register.php?step=verify')) ?>">Complete face verification</a><?php endif; ?>
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         <?php if (is_admin($me)): ?><a class="btn" href="<?= e(url('admin/index.php')) ?>">Open admin workspace</a><?php endif; ?>
         <?php if ($me['status'] === 'restricted'): ?><span class="tag tag-bad">Account restricted</span><?php endif; ?>
         <form class="inline-form m-only" method="post" action="<?= e(url('logout.php')) ?>" data-confirm="Are you sure you want to log out?"><?= csrf_field() ?><button class="btn" type="submit">Logout</button></form>
@@ -136,7 +125,6 @@
                 <div class="row-item">
                     <div>
                         <strong><?= e($l['title'] ?: 'Untitled') ?></strong> · <?= e(money($l['price'])) ?><br>
-<<<<<<< HEAD
                         <span class="small muted">
                             <?= $l['status'] === 'approved' && (int) $l['stock'] <= 0
                                 ? 'Out of stock'
@@ -145,12 +133,6 @@
                     </div>
                     <div class="btn-row">
                         <?php if (in_array($l['status'], ['draft', 'changes_requested', 'approved'], true)): ?>
-=======
-                        <span class="small muted"><?= e(listing_status_label($l['status'])) ?></span>
-                    </div>
-                    <div class="btn-row">
-                        <?php if (in_array($l['status'], ['draft', 'changes_requested'], true)): ?>
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                             <a class="btn btn-sm" href="<?= e(url('sell.php?id=' . (int) $l['id'])) ?>">Edit</a>
                         <?php endif; ?>
                         <a class="btn btn-sm" href="<?= e(url('listing.php?id=' . (int) $l['id'])) ?>">View</a>
@@ -173,11 +155,7 @@
                         <span class="small muted"><?= (int) $d['buyer_id'] === (int) $me['id'] ? 'Bought from' : 'Sold to' ?> <?= e(trim($d['other_firstname'] . ' ' . $d['other_lastname'])) ?> · <?= e(date_pretty($d['completed_at'])) ?></span>
                     </div>
                     <?php if ($d['conversation_id']): ?>
-<<<<<<< HEAD
                         <a class="btn btn-sm" href="<?= e(url('messages.php?c=' . (int) $d['conversation_id'] . '&deal=' . (int) $d['id'])) ?>"><?= (int) $d['reviewed'] > 0 ? 'View' : 'Rate' ?></a>
-=======
-                        <a class="btn btn-sm" href="<?= e(url('messages.php?c=' . (int) $d['conversation_id'])) ?>"><?= (int) $d['reviewed'] > 0 ? 'View' : 'Rate' ?></a>
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -202,7 +180,6 @@
             <?php endforeach; ?>
         </div>
 
-<<<<<<< HEAD
         <?php if (!is_admin($me)): ?>
             <div class="panel top-gap">
                 <div class="panel-head"><h2 class="h2">Customer service</h2><a class="btn btn-sm" href="<?= e(url('support.php')) ?>">Contact admin</a></div>
@@ -218,17 +195,3 @@
     </div>
 </section>
 <?php endif; ?>
-=======
-        <div class="panel top-gap">
-            <div class="panel-head"><h2 class="h2">Customer service</h2><a class="btn btn-sm" href="<?= e(url('support.php')) ?>">Contact admin</a></div>
-            <?php if (!$tickets): ?><p class="muted">No requests yet.</p><?php endif; ?>
-            <?php foreach ($tickets as $t): ?>
-                <div class="row-item">
-                    <div><strong><?= e($t['subject']) ?></strong><br><span class="small muted"><?= e(ucfirst($t['status'])) ?> · <?= e(time_ago($t['updated_at'])) ?></span></div>
-                    <a class="btn btn-sm" href="<?= e(url('support.php?t=' . (int) $t['id'])) ?>">Open</a>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073

@@ -18,7 +18,6 @@ final class UserRepository extends Repository
         return $this->one(self::BASE . ' WHERE u.email = ?', [strtolower(trim($email))]);
     }
 
-<<<<<<< HEAD
     public function findByLogin(string $login): ?array
     {
         $login = strtolower(trim($login));
@@ -44,14 +43,11 @@ final class UserRepository extends Repository
         ) > 0;
     }
 
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     public function emailExists(string $email): bool
     {
         return $this->value('SELECT COUNT(*) FROM users WHERE email = ?', [strtolower(trim($email))]) > 0;
     }
 
-<<<<<<< HEAD
     public function phoneExists(string $phone): bool
     {
         return $this->value('SELECT COUNT(*) FROM users WHERE phone = ? OR phone = ?', [
@@ -146,13 +142,6 @@ final class UserRepository extends Repository
         $this->run(
             'UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, town_id = ?, profile_pic = ? WHERE id = ?',
             [$first, $last, strtolower(trim($username)), strtolower(trim($email)), $townId, $profilePic, $id]
-=======
-    public function create(string $first, string $last, string $email, string $passwordHash, int $townId): int
-    {
-        return $this->insert(
-            'INSERT INTO users (firstname, lastname, email, password_hash, town_id, terms_accepted_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [$first, $last, strtolower(trim($email)), $passwordHash, $townId, now()]
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         );
     }
 
@@ -166,7 +155,6 @@ final class UserRepository extends Repository
         $this->run('UPDATE users SET password_hash = ? WHERE id = ?', [$hash, $id]);
     }
 
-<<<<<<< HEAD
     public function createVerificationCode(int $userId, string $channel, string $destination, string $codeHash, string $expiresAt): void
     {
         $this->run(
@@ -219,8 +207,6 @@ final class UserRepository extends Repository
         $this->run('UPDATE users SET phone_verified_at = ? WHERE id = ?', [now(), $userId]);
     }
 
-=======
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     /* ---- ratings -------------------------------------------------------- */
 
     /** @return array{seller: array{count:int, avg:?float}, buyer: array{count:int, avg:?float}} */
@@ -230,7 +216,6 @@ final class UserRepository extends Repository
             'seller' => ['count' => 0, 'avg' => null],
             'buyer' => ['count' => 0, 'avg' => null],
         ];
-<<<<<<< HEAD
         $rows = $this->all(
             "SELECT CASE reviewer_role WHEN 'buyer' THEN 'seller' ELSE 'buyer' END AS as_role,
                     COUNT(*) AS review_count, ROUND(AVG(rating), 1) AS avg_rating
@@ -239,9 +224,6 @@ final class UserRepository extends Repository
              GROUP BY reviewer_role",
             [$userId]
         );
-=======
-        $rows = $this->all('SELECT as_role, review_count, avg_rating FROM v_user_ratings WHERE user_id = ?', [$userId]);
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         foreach ($rows as $row) {
             $out[$row['as_role']] = ['count' => (int) $row['review_count'], 'avg' => (float) $row['avg_rating']];
         }
@@ -276,17 +258,10 @@ final class UserRepository extends Repository
     /** Adds a strike; the 3rd strike restricts the account. Returns the new count. */
     public function addViolation(int $userId): int
     {
-<<<<<<< HEAD
         $this->run("UPDATE users SET violation_count = violation_count + 1 WHERE id = ? AND status <> 'deactivated'", [$userId]);
         $count = (int) $this->value('SELECT violation_count FROM users WHERE id = ?', [$userId]);
         if ($count >= 3) {
             $this->run("UPDATE users SET status = 'restricted' WHERE id = ? AND role = 'member' AND status <> 'deactivated'", [$userId]);
-=======
-        $this->run('UPDATE users SET violation_count = violation_count + 1 WHERE id = ?', [$userId]);
-        $count = (int) $this->value('SELECT violation_count FROM users WHERE id = ?', [$userId]);
-        if ($count >= 3) {
-            $this->run("UPDATE users SET status = 'restricted' WHERE id = ? AND role = 'member'", [$userId]);
->>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         }
         return $count;
     }
