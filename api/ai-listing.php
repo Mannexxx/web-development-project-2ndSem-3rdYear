@@ -19,6 +19,13 @@ $user = current_user();
 if ($user === null) {
     json_response(['ok' => false, 'message' => 'Please sign in with a verified profile.'], 401);
 }
+if (!is_admin($user) && empty($user['email_verified_at'])) {
+    json_response([
+        'ok' => false,
+        'message' => 'Verify your email before continuing.',
+        'redirect' => url('register.php?step=verify_contact'),
+    ], 403);
+}
 
 $in = json_input();
 $action = (string) ($in['action'] ?? '');

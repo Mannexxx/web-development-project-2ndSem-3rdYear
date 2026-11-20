@@ -301,7 +301,19 @@ function require_login(string $message = 'Please sign in to continue.'): array
         $next = is_post() ? '' : safe_next($self, '');
         redirect('login.php' . ($next !== '' ? '?next=' . rawurlencode($next) : ''));
     }
+    require_email_verified($user);
     return $user;
+}
+
+function require_email_verified(array $user): void
+{
+    if (is_admin($user) || !empty($user['email_verified_at'])) {
+        return;
+    }
+
+    $self = ltrim(substr((string) ($_SERVER['REQUEST_URI'] ?? ''), strlen(BASE_PATH)), '/');
+    $next = is_post() ? '' : safe_next($self, '');
+    redirect('register.php?step=verify_contact' . ($next !== '' ? '&next=' . rawurlencode($next) : ''));
 }
 
 /** Signed in and not restricted. Used for messaging and selling. */
@@ -354,6 +366,9 @@ function view_session_key(): string
 function render(string $view, array $data = [], array $layout = []): void
 {
     $me = current_user();
+    if ($me !== null && $view !== 'register') {
+        require_email_verified($me);
+    }
     $layout += [
         'title' => APP_NAME,
         'tab' => null,

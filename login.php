@@ -10,7 +10,8 @@ use App\Service\AuthService;
 
 $next = safe_next($_POST['next'] ?? $_GET['next'] ?? '', '');
 
-if (current_user() !== null) {
+if (($signedIn = current_user()) !== null) {
+    require_email_verified($signedIn);
     redirect($next !== '' ? $next : 'index.php');
 }
 
