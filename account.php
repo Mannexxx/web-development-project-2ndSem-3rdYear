@@ -87,9 +87,25 @@ if (is_post()) {
         }
 
         $profilePic = $me['profile_pic'];
+        $sellerBackground = $me['seller_background'] ?? null;
+        $uploads = new UploadService();
+        $newProfilePic = null;
+        $newSellerBackground = null;
+        if (($_POST['remove_seller_background'] ?? '') === '1') {
+            $sellerBackground = null;
+        }
         if (!empty($_FILES['profile_picture']['name']) && $profileErrors === []) {
             try {
-                $profilePic = (new UploadService())->saveProfilePicture($_FILES['profile_picture']);
+                $newProfilePic = $uploads->saveProfilePicture($_FILES['profile_picture']);
+                $profilePic = $newProfilePic;
+            } catch (\RuntimeException $e) {
+                $profileErrors[] = $e->getMessage();
+            }
+        }
+        if (!empty($_FILES['seller_background']['name']) && $profileErrors === []) {
+            try {
+                $newSellerBackground = $uploads->saveSellerBackground($_FILES['seller_background']);
+                $sellerBackground = $newSellerBackground;
             } catch (\RuntimeException $e) {
                 $profileErrors[] = $e->getMessage();
             }
@@ -98,9 +114,19 @@ if (is_post()) {
         if ($profileErrors === []) {
             $emailChanged = $email !== strtolower((string) ($me['email'] ?? ''));
             $oldProfilePic = $me['profile_pic'];
-            $users->updateProfile($uid, $first, $last, $username, $email, $townId, $profilePic, $emailChanged);
+            $oldSellerBackground = $me['seller_background'] ?? null;
+            try {
+                $users->updateProfile($uid, $first, $last, $username, $email, $townId, $profilePic, $sellerBackground, $emailChanged);
+            } catch (\Throwable $e) {
+                $uploads->delete($newProfilePic);
+                $uploads->delete($newSellerBackground);
+                throw $e;
+            }
             if ($profilePic !== $oldProfilePic) {
-                (new UploadService())->delete($oldProfilePic);
+                $uploads->delete($oldProfilePic);
+            }
+            if ($sellerBackground !== $oldSellerBackground) {
+                $uploads->delete($oldSellerBackground);
             }
             $me = current_user(true);
             if ($emailChanged) {
@@ -112,6 +138,8 @@ if (is_post()) {
             flash('success', 'Profile updated.');
             redirect('account.php');
         }
+        $uploads->delete($newProfilePic);
+        $uploads->delete($newSellerBackground);
         $continueRendering = true;
     }
     if (!$continueRendering) {

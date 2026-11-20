@@ -57,6 +57,12 @@ final class UploadService
         return $this->store($file, 'uploads/profiles', self::IMAGE_TYPES[$mime]);
     }
 
+    public function saveSellerBackground(array $file): string
+    {
+        [$mime] = $this->validate($file, self::IMAGE_TYPES, true);
+        return $this->store($file, 'uploads/profiles', self::IMAGE_TYPES[$mime]);
+    }
+
     /**
      * Evidence goes into storage/ which the web server never serves directly.
      *

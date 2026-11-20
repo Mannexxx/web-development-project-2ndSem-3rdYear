@@ -14,20 +14,55 @@ $mh = $layout['mobile_header'];
         </form>
         <nav class="header-nav" aria-label="Account">
             <?php if ($me): ?>
-                <a class="nav-link hide-mobile" href="<?= e(url('messages.php')) ?>">Messages<?php if ($unread > 0): ?> <span class="badge"><?= (int) $unread ?></span><?php endif; ?></a>
-                <a class="nav-link hide-mobile" href="<?= e(url('purchases.php')) ?>">My Purchases</a>
-                <a class="nav-link hide-mobile" href="<?= e(url('account.php')) ?>">Account</a>
+                <a class="header-icon-link hide-mobile" href="<?= e(url('messages.php')) ?>" aria-label="Messages<?= $unread > 0 ? ' (' . (int) $unread . ' unread)' : '' ?>" title="Messages">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6a7.5 7.5 0 1 1 17-3.5Z"></path>
+                        <path d="M8 10h8M8 14h5"></path>
+                    </svg>
+                    <span class="header-icon-label">Messages</span>
+                    <?php if ($unread > 0): ?><span class="badge"><?= (int) $unread ?></span><?php endif; ?>
+                </a>
+                <a class="header-icon-link hide-mobile" href="<?= e(url('purchases.php')) ?>" aria-label="My Purchases" title="My Purchases">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M5 8h14l1 13H4L5 8Z"></path>
+                        <path d="M9 9V6a3 3 0 0 1 6 0v3"></path>
+                    </svg>
+                    <span class="header-icon-label">My Purchases</span>
+                </a>
                 <?php if (is_admin($me)): ?>
                     <a class="nav-link hide-mobile" href="<?= e(url('admin/index.php')) ?>">Admin</a>
                 <?php endif; ?>
-                <form class="inline-form hide-mobile" method="post" action="<?= e(url('logout.php')) ?>" data-confirm="Are you sure you want to log out?">
-                    <?= csrf_field() ?>
-                    <button type="submit" class="nav-link nav-button">Logout</button>
-                </form>
+                <div class="profile-menu">
+                    <button
+                        class="profile-menu-trigger"
+                        type="button"
+                        aria-label="Open profile menu"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        aria-controls="header-profile-menu"
+                        data-profile-menu-button
+                    >
+                        <span class="profile-menu-avatar">
+                            <?php if (!empty($me['profile_pic'])): ?>
+                                <img src="<?= e(url((string) $me['profile_pic'])) ?>" alt="">
+                            <?php else: ?>
+                                <?= e(mb_strtoupper(mb_substr((string) ($me['firstname'] ?? ''), 0, 1))) ?>
+                            <?php endif; ?>
+                        </span>
+                    </button>
+                    <div class="profile-menu-panel" id="header-profile-menu" role="menu" hidden>
+                        <a href="<?= e(url('account.php')) ?>" role="menuitem">Profile</a>
+                        <form class="inline-form" method="post" action="<?= e(url('logout.php')) ?>" data-confirm="Are you sure you want to log out?">
+                            <?= csrf_field() ?>
+                            <button type="submit" role="menuitem">Logout</button>
+                        </form>
+                    </div>
+                </div>
+                <a class="btn btn-primary btn-sm hide-mobile" href="<?= e(url('sell.php')) ?>">Sell a product</a>
             <?php else: ?>
                 <a class="nav-link" href="<?= e(url('login.php')) ?>">Sign in<span class="hide-mobile"> / Register</span></a>
+                <a class="btn btn-primary btn-sm hide-mobile" href="<?= e(url('sell.php')) ?>">Sell a product</a>
             <?php endif; ?>
-            <a class="btn btn-primary btn-sm hide-mobile" href="<?= e(url('sell.php')) ?>">Sell a product</a>
         </nav>
     </div>
 </header>

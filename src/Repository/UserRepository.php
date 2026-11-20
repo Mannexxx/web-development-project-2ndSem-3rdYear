@@ -81,8 +81,10 @@ final class UserRepository extends Repository
                  UNION ALL
                  SELECT reference_image FROM face_verifications WHERE user_id = ? AND reference_image IS NOT NULL
                  UNION ALL
-                 SELECT profile_pic FROM users WHERE id = ? AND profile_pic IS NOT NULL',
-                [$userId, $userId, $userId]
+                 SELECT profile_pic FROM users WHERE id = ? AND profile_pic IS NOT NULL
+                 UNION ALL
+                 SELECT seller_background FROM users WHERE id = ? AND seller_background IS NOT NULL',
+                [$userId, $userId, $userId, $userId]
             ),
             'file_path'
         );
@@ -107,6 +109,7 @@ final class UserRepository extends Repository
                  SET firstname = 'Deleted', lastname = 'Account', username = ?, email = NULL, phone = NULL,
                      phone_carrier = NULL, email_verified_at = NULL, phone_verified_at = NULL,
                      password_hash = ?, status = 'deactivated', violation_count = 0, profile_pic = NULL,
+                     seller_background = NULL,
                      face_verified_at = NULL
                  WHERE id = ?",
                 ['deleted-' . $userId, $randomPasswordHash, $userId]
@@ -130,18 +133,18 @@ final class UserRepository extends Repository
         ) > 0;
     }
 
-    public function updateProfile(int $id, string $first, string $last, string $username, string $email, int $townId, ?string $profilePic, bool $emailChanged): void
+    public function updateProfile(int $id, string $first, string $last, string $username, string $email, int $townId, ?string $profilePic, ?string $sellerBackground, bool $emailChanged): void
     {
         if ($emailChanged) {
             $this->run(
-                'UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, email_verified_at = NULL, town_id = ?, profile_pic = ? WHERE id = ?',
-                [$first, $last, strtolower(trim($username)), strtolower(trim($email)), $townId, $profilePic, $id]
+                'UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, email_verified_at = NULL, town_id = ?, profile_pic = ?, seller_background = ? WHERE id = ?',
+                [$first, $last, strtolower(trim($username)), strtolower(trim($email)), $townId, $profilePic, $sellerBackground, $id]
             );
             return;
         }
         $this->run(
-            'UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, town_id = ?, profile_pic = ? WHERE id = ?',
-            [$first, $last, strtolower(trim($username)), strtolower(trim($email)), $townId, $profilePic, $id]
+            'UPDATE users SET firstname = ?, lastname = ?, username = ?, email = ?, town_id = ?, profile_pic = ?, seller_background = ? WHERE id = ?',
+            [$first, $last, strtolower(trim($username)), strtolower(trim($email)), $townId, $profilePic, $sellerBackground, $id]
         );
     }
 

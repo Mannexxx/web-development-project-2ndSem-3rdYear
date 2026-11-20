@@ -8,7 +8,12 @@
 $sr = $ratings['seller'];
 $br = $ratings['buyer'];
 ?>
-<section class="wrap page-head">
+<section
+    class="wrap page-head seller-profile-head<?= !empty($seller['seller_background']) ? ' has-background' : '' ?>"
+    <?php if (!empty($seller['seller_background'])): ?>
+        style="background-image: linear-gradient(90deg, rgba(35, 26, 19, .76), rgba(35, 26, 19, .28)), url('<?= e(url((string) $seller['seller_background'])) ?>')"
+    <?php endif; ?>
+>
     <div class="account-heading">
         <div class="profile-avatar">
             <?php if (!empty($seller['profile_pic'])): ?>
@@ -22,6 +27,14 @@ $br = $ratings['buyer'];
             <h1 class="h1"><?= e(full_name($seller)) ?></h1>
             <p class="lead"><?= e(town_label($seller['town_name'])) ?> · Member since <?= e(date('Y', strtotime((string) $seller['created_at']))) ?></p>
         </div>
+    </div>
+</section>
+
+<section class="wrap section pad-bottom">
+    <h2 class="h2">Listings by <?= e($seller['firstname']) ?></h2>
+    <?php if (!$items): ?><p class="muted">No live listings right now.</p><?php endif; ?>
+    <div class="grid">
+        <?php foreach ($items as $card): ?><?php include VIEW_PATH . '/partials/card.php'; ?><?php endforeach; ?>
     </div>
 </section>
 
@@ -52,13 +65,5 @@ $br = $ratings['buyer'];
             </blockquote>
         <?php endforeach; ?>
         <p class="small muted top-gap">After a completed deal, buyers and sellers can rate one another.</p>
-    </div>
-</section>
-
-<section class="wrap section pad-bottom">
-    <h2 class="h2">Listings by <?= e($seller['firstname']) ?></h2>
-    <?php if (!$items): ?><p class="muted">No live listings right now.</p><?php endif; ?>
-    <div class="grid">
-        <?php foreach ($items as $card): ?><?php include VIEW_PATH . '/partials/card.php'; ?><?php endforeach; ?>
     </div>
 </section>

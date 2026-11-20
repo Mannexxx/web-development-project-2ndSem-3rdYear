@@ -35,6 +35,7 @@ Users may register with an email address or Philippine mobile number. Email and 
 
 For databases created before carrier selection was added, run `database/migrations/20261119_add_phone_carrier.sql` once in phpMyAdmin. New databases get the carrier field from either schema SQL file.
 For existing databases, run `database/migrations/20261120_add_deactivated_account_status.sql` once to enable account deactivation. Run `database/migrations/20261120_add_listing_stock_and_purchases.sql` once to add listing inventory and buyer orders. New databases get these features from either schema SQL file.
+For existing databases, run `database/migrations/20261120_add_seller_background.sql` once to enable seller profile background images. New databases get the field from either schema SQL file.
 
 ## Google sign-in
 

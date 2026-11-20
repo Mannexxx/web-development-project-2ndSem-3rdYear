@@ -52,6 +52,56 @@
     }
   }
 
+  // Profile avatar menu in the site header.
+  var profileMenuButton = document.querySelector('[data-profile-menu-button]');
+  var profileMenu = profileMenuButton && document.getElementById(profileMenuButton.getAttribute('aria-controls'));
+  if (profileMenuButton && profileMenu) {
+    function setProfileMenuOpen(open) {
+      profileMenu.hidden = !open;
+      profileMenuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    profileMenuButton.addEventListener('click', function () {
+      setProfileMenuOpen(profileMenuButton.getAttribute('aria-expanded') !== 'true');
+    });
+    document.addEventListener('click', function (event) {
+      if (!profileMenu.contains(event.target) && !profileMenuButton.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    });
+    profileMenu.addEventListener('click', function (event) {
+      if (event.target.closest('a, button')) {
+        setProfileMenuOpen(false);
+      }
+    });
+    profileMenu.addEventListener('keydown', function (event) {
+      var items = Array.prototype.slice.call(profileMenu.querySelectorAll('[role="menuitem"]'));
+      var currentIndex = items.indexOf(document.activeElement);
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        var direction = event.key === 'ArrowDown' ? 1 : -1;
+        var nextIndex = currentIndex < 0
+          ? 0
+          : (currentIndex + direction + items.length) % items.length;
+        items[nextIndex].focus();
+      } else if (event.key === 'Home' || event.key === 'End') {
+        event.preventDefault();
+        items[event.key === 'Home' ? 0 : items.length - 1].focus();
+      }
+    });
+    profileMenu.addEventListener('focusout', function (event) {
+      if (!profileMenu.contains(event.relatedTarget)) {
+        setProfileMenuOpen(false);
+      }
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && profileMenuButton.getAttribute('aria-expanded') === 'true') {
+        setProfileMenuOpen(false);
+        profileMenuButton.focus();
+      }
+    });
+  }
+
   // Product gallery thumbnails.
   document.querySelectorAll('[data-gallery]').forEach(function (g) {
     var main = g.querySelector('[data-gallery-main]');
@@ -203,5 +253,59 @@
       activatePurchaseTab(purchaseStatusFromHash(window.location.hash));
     });
     activatePurchaseTab(purchaseStatusFromHash(window.location.hash));
+  }
+
+  // Show one account section at a time.
+  var accountTabs = Array.prototype.slice.call(document.querySelectorAll('[data-account-tab]'));
+  var accountSections = document.querySelectorAll('.account-panel');
+  var accountTabList = document.querySelector('[data-account-default]');
+  if (accountTabs.length && accountSections.length && accountTabList) {
+    function activateAccountTab(id) {
+      var selectedTab = accountTabs.find(function (tab) {
+        return tab.getAttribute('aria-controls') === id;
+      }) || accountTabs.find(function (tab) {
+        return tab.getAttribute('aria-controls') === accountTabList.dataset.accountDefault;
+      }) || accountTabs[0];
+
+      accountTabs.forEach(function (tab) {
+        var selected = tab === selectedTab;
+        tab.classList.toggle('active', selected);
+        tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      accountSections.forEach(function (section) {
+        section.hidden = section.id !== selectedTab.getAttribute('aria-controls');
+      });
+    }
+
+    accountTabs.forEach(function (tab, index) {
+      tab.addEventListener('click', function (event) {
+        event.preventDefault();
+        window.history.pushState(null, '', tab.hash);
+        activateAccountTab(tab.hash.slice(1));
+      });
+      tab.addEventListener('keydown', function (event) {
+        var nextIndex = index;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          nextIndex = (index + 1) % accountTabs.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          nextIndex = (index - 1 + accountTabs.length) % accountTabs.length;
+        } else if (event.key === 'Home') {
+          nextIndex = 0;
+        } else if (event.key === 'End') {
+          nextIndex = accountTabs.length - 1;
+        } else {
+          return;
+        }
+        event.preventDefault();
+        accountTabs[nextIndex].focus();
+        accountTabs[nextIndex].click();
+      });
+    });
+
+    window.addEventListener('popstate', function () {
+      activateAccountTab(window.location.hash.slice(1));
+    });
+    activateAccountTab(window.location.hash.slice(1) || accountTabList.dataset.accountDefault);
   }
 })();

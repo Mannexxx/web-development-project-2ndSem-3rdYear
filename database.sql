@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS users (
   status             ENUM('active','restricted','deactivated') NOT NULL DEFAULT 'active',
   violation_count    INT UNSIGNED NOT NULL DEFAULT 0,
   profile_pic        VARCHAR(255) NULL,
+  seller_background VARCHAR(255) NULL,
   terms_accepted_at  DATETIME     NOT NULL,
   face_verified_at   DATETIME     NULL,
   last_login_at      DATETIME     NULL,

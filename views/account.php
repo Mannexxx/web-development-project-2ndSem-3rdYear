@@ -90,7 +90,13 @@
     </div>
 </section>
 <?php else: ?>
-<section class="wrap page-head">
+<div
+    class="account-profile-banner<?= !empty($me['seller_background']) ? ' has-background' : '' ?>"
+    <?php if (!empty($me['seller_background'])): ?>
+        style="background-image: url('<?= e(url((string) $me['seller_background'])) ?>')"
+    <?php endif; ?>
+>
+<section class="wrap page-head account-profile-header">
     <div class="account-heading">
         <div class="profile-avatar">
             <?php if (!empty($me['profile_pic'])): ?>
@@ -106,15 +112,29 @@
         </div>
     </div>
     <div class="btn-row">
-        <a class="btn" href="<?= e(url('account.php?section=edit-profile')) ?>">Edit profile</a>
-        <?php if (!is_admin($me)): ?><a class="btn" href="<?= e(url('account.php?section=settings')) ?>">Account settings</a><?php endif; ?>
         <?php if (is_admin($me)): ?><a class="btn" href="<?= e(url('admin/index.php')) ?>">Open admin workspace</a><?php endif; ?>
         <?php if ($me['status'] === 'restricted'): ?><span class="tag tag-bad">Account restricted</span><?php endif; ?>
-        <form class="inline-form m-only" method="post" action="<?= e(url('logout.php')) ?>" data-confirm="Are you sure you want to log out?"><?= csrf_field() ?><button class="btn" type="submit">Logout</button></form>
     </div>
 </section>
 
-<section class="wrap pad-bottom account-grid">
+<section class="wrap page-head account-profile-tabs">
+    <div class="account-tab-controls">
+        <nav class="chips" aria-label="Account sections" role="tablist" data-account-default="overview">
+            <a class="chip" id="overview-tab" href="#overview" role="tab" aria-controls="overview" aria-selected="false" tabindex="-1" data-account-tab>Overview</a>
+            <a class="chip" id="edit-profile-tab" href="#edit-profile" role="tab" aria-controls="edit-profile" aria-selected="false" tabindex="-1" data-account-tab>Edit profile</a>
+            <?php if (!is_admin($me)): ?>
+                <a class="chip" id="settings-tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false" tabindex="-1" data-account-tab>Account settings</a>
+            <?php endif; ?>
+        </nav>
+        <form class="inline-form account-tabs-logout" method="post" action="<?= e(url('logout.php')) ?>" data-confirm="Are you sure you want to log out?">
+            <?= csrf_field() ?>
+            <button class="chip account-logout-button" type="submit">Logout</button>
+        </form>
+    </div>
+</section>
+</div>
+
+<section class="wrap pad-bottom account-grid account-panel" id="overview" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
     <div>
         <div class="panel">
             <div class="panel-head"><h2 class="h2">My listings</h2><a class="btn btn-primary btn-sm" href="<?= e(url('sell.php')) ?>">Sell a product</a></div>
@@ -193,5 +213,11 @@
             </div>
         <?php endif; ?>
     </div>
+</section>
+<section class="account-panels">
+    <?php require VIEW_PATH . '/partials/account-edit-profile.php'; ?>
+    <?php if (!is_admin($me)): ?>
+        <?php require VIEW_PATH . '/partials/account-settings.php'; ?>
+    <?php endif; ?>
 </section>
 <?php endif; ?>
