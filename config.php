@@ -40,7 +40,7 @@ define('APP_DEBUG', filter_var($debugSetting, FILTER_VALIDATE_BOOLEAN));
 define('APP_TZ', 'Asia/Manila');
 define('MAX_PHOTOS', 8);
 define('MAX_UPLOAD_BYTES', 5 * 1024 * 1024);
-define('ASSET_VERSION', '28');
+define('ASSET_VERSION', '29');
 
 define('SMTP_HOST', $providerSetting('SMTP_HOST', 'smtp_host'));
 define('SMTP_PORT', (int) $providerSetting('SMTP_PORT', 'smtp_port', '587'));

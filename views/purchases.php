@@ -12,16 +12,31 @@ $sections = [
     <p class="eyebrow">BUYER WORKSPACE</p>
     <h1 class="h1">My Purchases</h1>
     <p class="lead">Coordinate local pickup with each seller. No online payment or delivery is collected by this site.</p>
-    <nav class="chips" aria-label="Purchase sections">
+    <nav class="chips" aria-label="Purchase sections" role="tablist">
         <?php foreach ($sections as $status => $label): ?>
-            <a class="chip" href="#<?= e($status) ?>"><?= e($label) ?> (<?= count($itemsByStatus[$status]) ?>)</a>
+            <a
+                class="chip"
+                id="<?= e($status) ?>-tab"
+                href="#<?= e($status) ?>"
+                role="tab"
+                aria-controls="<?= e($status) ?>"
+                aria-selected="false"
+                tabindex="-1"
+                data-purchase-tab
+            ><?= e($label) ?> (<?= count($itemsByStatus[$status]) ?>)</a>
         <?php endforeach; ?>
     </nav>
 </section>
 
 <section class="wrap pad-bottom purchase-sections">
     <?php foreach ($sections as $status => $label): ?>
-        <section class="panel purchase-section" id="<?= e($status) ?>">
+        <section
+            class="panel purchase-section"
+            id="<?= e($status) ?>"
+            role="tabpanel"
+            aria-labelledby="<?= e($status) ?>-tab"
+            tabindex="0"
+        >
             <h2 class="h2"><?= e($label) ?></h2>
             <?php if ($itemsByStatus[$status] === []): ?>
                 <p class="muted top-gap-sm">No purchases here yet.</p>

@@ -146,4 +146,62 @@
       });
     });
   }
+
+  // Show one purchase status section at a time.
+  var purchaseTabs = Array.prototype.slice.call(document.querySelectorAll('[data-purchase-tab]'));
+  var purchaseSections = document.querySelectorAll('.purchase-section');
+  if (purchaseTabs.length && purchaseSections.length) {
+    function purchaseStatusFromHash(hash) {
+      return (hash || '').replace(/^#/, '').replace(/-/g, '_');
+    }
+
+    function activatePurchaseTab(status) {
+      var selectedTab = purchaseTabs.find(function (tab) {
+        return tab.getAttribute('aria-controls') === status;
+      });
+      if (!selectedTab) {
+        selectedTab = purchaseTabs[0];
+      }
+
+      purchaseTabs.forEach(function (tab) {
+        var selected = tab === selectedTab;
+        tab.classList.toggle('active', selected);
+        tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      purchaseSections.forEach(function (section) {
+        section.hidden = section.id !== selectedTab.getAttribute('aria-controls');
+      });
+    }
+
+    purchaseTabs.forEach(function (tab, index) {
+      tab.addEventListener('click', function (event) {
+        event.preventDefault();
+        window.history.pushState(null, '', tab.hash);
+        activatePurchaseTab(purchaseStatusFromHash(tab.hash));
+      });
+      tab.addEventListener('keydown', function (event) {
+        var nextIndex = index;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+          nextIndex = (index + 1) % purchaseTabs.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+          nextIndex = (index - 1 + purchaseTabs.length) % purchaseTabs.length;
+        } else if (event.key === 'Home') {
+          nextIndex = 0;
+        } else if (event.key === 'End') {
+          nextIndex = purchaseTabs.length - 1;
+        } else {
+          return;
+        }
+        event.preventDefault();
+        purchaseTabs[nextIndex].focus();
+        purchaseTabs[nextIndex].click();
+      });
+    });
+
+    window.addEventListener('popstate', function () {
+      activatePurchaseTab(purchaseStatusFromHash(window.location.hash));
+    });
+    activatePurchaseTab(purchaseStatusFromHash(window.location.hash));
+  }
 })();
