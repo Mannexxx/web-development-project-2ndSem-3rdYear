@@ -1,0 +1,149 @@
+/* Small, dependency-free helpers used across pages. */
+(function () {
+  'use strict';
+
+  var flashContainer = document.querySelector('.flashes');
+  if (flashContainer) {
+    var header = document.querySelector('.admin-header, .site-header, .m-appbar');
+    if (header && header.getClientRects().length) {
+      flashContainer.style.top = (header.getBoundingClientRect().bottom + 8) + 'px';
+    }
+  }
+
+  // Automatically dismiss flash notices after they have been visible for five seconds.
+  document.querySelectorAll('.flash').forEach(function (flash) {
+    window.setTimeout(function () {
+      flash.classList.add('flash-dismissing');
+      window.setTimeout(function () {
+        var container = flash.parentElement;
+        flash.remove();
+        if (container && container.classList.contains('flashes') && !container.querySelector('.flash')) {
+          container.remove();
+        }
+      }, 250);
+    }, 5000);
+  });
+
+  // Filters: submit the form as soon as a select changes.
+  document.querySelectorAll('select[data-autosubmit]').forEach(function (sel) {
+    sel.addEventListener('change', function () { sel.form && sel.form.submit(); });
+  });
+
+  // Mobile sort select mirrors the (hidden on mobile) desktop one.
+  var mirror = document.querySelector('[data-mirror-sort]');
+  if (mirror) {
+    mirror.addEventListener('change', function () {
+      var main = document.querySelector('select[name="sort"][data-autosubmit]');
+      if (main) { main.value = mirror.value; main.form.submit(); }
+    });
+  }
+
+  // Mobile "Filters" toggle.
+  var toggle = document.querySelector('[data-toggle-filters]');
+  var selects = document.getElementById('filter-selects');
+  if (toggle && selects) {
+    toggle.addEventListener('click', function () {
+      var open = selects.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // Keep it open when a filter is active so people can see why results changed.
+    if (Array.prototype.some.call(selects.querySelectorAll('select'), function (s) { return s.value !== ''; })) {
+      selects.classList.add('open');
+    }
+  }
+
+  // Product gallery thumbnails.
+  document.querySelectorAll('[data-gallery]').forEach(function (g) {
+    var main = g.querySelector('[data-gallery-main]');
+    g.querySelectorAll('.thumb').forEach(function (t) {
+      t.addEventListener('click', function () {
+        if (main) { main.src = t.dataset.src; }
+        g.querySelectorAll('.thumb').forEach(function (o) { o.classList.remove('active'); });
+        t.classList.add('active');
+      });
+    });
+  });
+
+  // Share button (product page, mobile).
+  document.querySelectorAll('[data-share]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var data = { title: document.title, url: window.location.href };
+      if (navigator.share) { navigator.share(data).catch(function () {}); return; }
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(data.url).then(function () { b.textContent = 'Link copied'; setTimeout(function () { b.textContent = 'Share'; }, 1800); });
+      }
+    });
+  });
+
+  // File input label shows the chosen file names.
+  document.querySelectorAll('[data-file-input]').forEach(function (input) {
+    var label = input.closest('label') && input.closest('label').querySelector('[data-file-label]');
+    if (!label) return;
+    var original = label.textContent;
+    input.addEventListener('change', function () {
+      var names = Array.prototype.map.call(input.files, function (f) { return f.name; });
+      label.textContent = names.length ? names.join(', ') : original;
+    });
+  });
+
+  // Confirm before destructive buttons.
+  document.querySelectorAll('[data-confirm-click]').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      if (!window.confirm(b.dataset.confirmClick)) { e.preventDefault(); }
+    });
+  });
+
+  // Confirm dialogs for risky forms.
+  document.querySelectorAll('form[data-confirm]').forEach(function (f) {
+    f.addEventListener('submit', function (e) {
+      if (!window.confirm(f.dataset.confirm)) { e.preventDefault(); }
+    });
+  });
+
+  // Password visibility controls on auth pages.
+  document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var input = document.getElementById(button.dataset.passwordToggle);
+      if (!input) return;
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.textContent = show ? 'Hide' : 'Show';
+      button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  });
+
+  // Switch between sign-in and registration without leaving the shared auth page.
+  var authLinks = document.querySelectorAll('[data-auth-mode]');
+  var authPanels = document.querySelectorAll('[data-auth-panel]');
+  if (authLinks.length && authPanels.length) {
+    function setAuthMode(mode, targetUrl) {
+      authPanels.forEach(function (panel) {
+        panel.hidden = panel.dataset.authPanel !== mode;
+      });
+      authLinks.forEach(function (link) {
+        if (link.dataset.authMode === mode) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+      document.querySelectorAll('[data-auth-copy]').forEach(function (copy) {
+        copy.textContent = copy.dataset[mode];
+      });
+      var authPage = document.querySelector('[data-auth-login-title]');
+      if (authPage) {
+        document.title = authPage.dataset['auth' + mode.charAt(0).toUpperCase() + mode.slice(1) + 'Title'];
+      }
+      if (targetUrl) {
+        window.history.replaceState(null, '', targetUrl);
+      }
+    }
+
+    authLinks.forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        setAuthMode(link.dataset.authMode, link.href);
+      });
+    });
+  }
+})();

@@ -1,0 +1,5 @@
+Options -Indexes
+
+<FilesMatch "^(config(\.local)?\.php|composer\.(json|lock)|README\.md|.*\.sql)$">
+    Require all denied
+</FilesMatch>
