@@ -5,7 +5,10 @@
 /** @var ?array $deal */
 /** @var ?array $myReview */
 /** @var int $uid */
+<<<<<<< HEAD
 /** @var bool $hasPurchase */
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 $isSeller = $current !== null && (int) $current['seller_id'] === $uid;
 $otherName = $current === null ? '' : ($isSeller ? full_name($current, 'buyer_') : full_name($current, 'seller_'));
@@ -58,7 +61,11 @@ $otherFirst = $current === null ? '' : ($isSeller ? $current['buyer_firstname'] 
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="send">
                     <input type="hidden" name="conversation_id" value="<?= (int) $current['id'] ?>">
+<<<<<<< HEAD
                     <input type="hidden" name="return" value="<?= e(message_return($_GET['return'] ?? '', 'messages.php?c=' . (int) $current['id'])) ?>">
+=======
+                    <input type="hidden" name="return" value="<?= e('messages.php?c=' . (int) $current['id']) ?>">
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                     <div class="field grow">
                         <label for="body">Your message</label>
                         <input id="body" name="body" type="text" maxlength="2000" placeholder="Type a message…" autocomplete="off" required>
@@ -69,7 +76,11 @@ $otherFirst = $current === null ? '' : ($isSeller ? $current['buyer_firstname'] 
                 <hr class="rule">
                 <?php if ($deal !== null): ?>
                     <div class="done-box">
+<<<<<<< HEAD
                         <p><strong>Transaction recorded</strong> · <?= e(date_pretty($deal['completed_at'])) ?></p>
+=======
+                        <p><strong>Deal completed</strong> · <?= e(date_pretty($deal['completed_at'])) ?></p>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                         <?php if ($myReview !== null): ?>
                             <p class="muted">You rated <?= e($otherFirst) ?> <span class="stars"><?= e(stars($myReview['rating'])) ?></span><?= $myReview['comment'] ? ' · “' . e($myReview['comment']) . '”' : '' ?></p>
                         <?php else: ?>
@@ -89,11 +100,19 @@ $otherFirst = $current === null ? '' : ($isSeller ? $current['buyer_firstname'] 
                                     <label for="comment">Comment (optional)</label>
                                     <input id="comment" name="comment" maxlength="500" placeholder="How was the deal?">
                                 </div>
+<<<<<<< HEAD
                                 <button class="btn btn-primary" type="submit" data-confirm-click="Submit this rating? You can only rate this transaction once.">Submit rating</button>
                             </form>
                         <?php endif; ?>
                     </div>
                 <?php elseif ($isSeller && $current['listing_status'] === 'approved' && !$hasPurchase): ?>
+=======
+                                <button class="btn btn-primary" type="submit" data-confirm-click="Submit this rating? You can only rate this completed deal once.">Submit rating</button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                <?php elseif ($isSeller && $current['listing_status'] === 'approved'): ?>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                     <form method="post" action="<?= e(url('messages.php')) ?>" data-confirm="Mark “<?= e($current['listing_title']) ?>” as sold to <?= e($otherName) ?>? This closes the listing.">
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="sold">

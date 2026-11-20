@@ -271,8 +271,12 @@ function current_user(bool $refresh = false): ?array
         $id = (int) ($_SESSION['user_id'] ?? 0);
         if ($id > 0) {
             $user = repo(App\Repository\UserRepository::class)->find($id);
+<<<<<<< HEAD
             if ($user === null || $user['status'] === 'deactivated') {
                 $user = null;
+=======
+            if ($user === null) {
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                 unset($_SESSION['user_id']);
             }
         }
@@ -304,13 +308,24 @@ function require_login(string $message = 'Please sign in to continue.'): array
     return $user;
 }
 
+<<<<<<< HEAD
 /** Signed in and not restricted. Used for messaging and selling. */
+=======
+/** Signed in AND face-verified AND not restricted. Used for messaging and selling. */
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 function require_verified(string $action = 'do this'): array
 {
     $user = require_login('Please sign in to ' . $action . '.');
     if (is_admin($user)) {
         return $user;
     }
+<<<<<<< HEAD
+=======
+    if (!is_verified($user)) {
+        flash('info', 'Verify your profile with face verification to ' . $action . '.');
+        redirect('register.php?step=verify');
+    }
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     if ($user['status'] === 'restricted') {
         flash('error', 'Your account is restricted because of repeated guideline violations. Please contact customer service.');
         redirect('support.php');
@@ -349,7 +364,11 @@ function view_session_key(): string
  *
  * Layout options: title, tab (explore|sell|messages|profile), body_class,
  * scripts (array of js files), mobile_header (array|null), footer (array|null),
+<<<<<<< HEAD
  * chrome ('site' | 'admin'), hide_header (bool), hide_tabs (bool)
+=======
+ * chrome ('site' | 'admin'), hide_tabs (bool)
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
  */
 function render(string $view, array $data = [], array $layout = []): void
 {
@@ -362,7 +381,10 @@ function render(string $view, array $data = [], array $layout = []): void
         'mobile_header' => null,
         'footer' => null,
         'chrome' => 'site',
+<<<<<<< HEAD
         'hide_header' => false,
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         'hide_tabs' => false,
     ];
     extract($data, EXTR_SKIP);

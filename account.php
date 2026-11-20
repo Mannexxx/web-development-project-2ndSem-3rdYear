@@ -9,14 +9,18 @@ use App\Repository\ListingRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\SupportRepository;
 use App\Repository\UserRepository;
+<<<<<<< HEAD
 use App\Repository\TownRepository;
 use App\Service\AuthService;
 use App\Service\UploadService;
 use App\Service\VerificationService;
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 $me = require_login('Please sign in to see your account.');
 $uid = (int) $me['id'];
 $notes = repo(NotificationRepository::class);
+<<<<<<< HEAD
 $users = repo(UserRepository::class);
 $towns = repo(TownRepository::class)->all();
 $profileErrors = [];
@@ -128,12 +132,31 @@ $pageTitle = match ($section) {
 
 render('account', [
     'ratings' => $users->ratings($uid),
+=======
+
+if (is_post()) {
+    verify_csrf();
+    if (($_POST['action'] ?? '') === 'read_notifications') {
+        $notes->markAllRead($uid);
+    }
+    redirect('account.php#notifications');
+}
+
+$notifications = $notes->forUser($uid, 15);
+
+render('account', [
+    'ratings' => repo(UserRepository::class)->ratings($uid),
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     'myListings' => repo(ListingRepository::class)->forSeller($uid),
     'deals' => repo(DealRepository::class)->forUser($uid),
     'tickets' => repo(SupportRepository::class)->forUser($uid),
     'notifications' => $notifications,
     'unreadNotes' => $notes->unreadCount($uid),
+<<<<<<< HEAD
     'towns' => $towns,
     'profileErrors' => $profileErrors,
     'section' => $section,
 ], ['title' => $pageTitle, 'tab' => 'profile']);
+=======
+], ['title' => 'My account · ' . APP_NAME, 'tab' => 'profile']);
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073

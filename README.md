@@ -1,11 +1,16 @@
 # Bantayan Marketplace
 
 A PHP + MySQL local marketplace for Bantayan Island, built from your wireframes (desktop and mobile).
+<<<<<<< HEAD
 Runs on XAMPP; Composer installs PHPMailer for email and SMS gateway verification.
+=======
+Runs on XAMPP with no Composer and no external services.
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 ## Run it (XAMPP)
 
 1. Copy this folder to `C:\xampp\htdocs\marketplace`. Start **Apache** and **MySQL** in the XAMPP Control Panel.
+<<<<<<< HEAD
 2. In phpMyAdmin, create and select a database named `bantayan_market`, then import `database.sql`. The schema creates the tables, categories, towns, and guidelines in the selected database.
 3. Open `http://localhost/marketplace/`.
 
@@ -47,6 +52,26 @@ Google sign-in is implemented with Google's OpenID Connect authorization-code fl
 5. Open `http://localhost/marketplace/login.php` and try **Sign in with Google**.
 
 The redirect URI must match exactly in Google Cloud Console and `config.local.php`. For another local hostname, port, installation path, or a production HTTPS domain, replace it in both places with the full callback URL for that deployment. The app also accepts `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` environment variables.
+=======
+2. Open `http://localhost/phpmyadmin` > **Import** and import, in this order:
+   1. `database/schema.sql` – creates the database `bantayan_market`, all tables, categories, towns, guidelines and the admin account.
+   2. `database/sample_data.sql` – *optional* demo listings, users, messages and reviews (import once).
+3. Open `http://localhost/marketplace/`.
+
+Database settings are the XAMPP defaults (`root`, empty password) in `config.php`.
+
+## Accounts
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@bantayan.local` | `Admin@12345` (**change it**) |
+| Demo seller | `maria.santos@example.com` | `Password1!` |
+| Demo buyer | `ana.reyes@example.com` | `Password1!` |
+| Demo, not verified | `ben.lopez@example.com` | `Password1!` |
+
+To change the admin password, create a hash with `php -r "echo password_hash('NewPass1!', PASSWORD_DEFAULT);"`
+and run in phpMyAdmin: `UPDATE users SET password_hash = '<hash>' WHERE email = 'admin@bantayan.local';`
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 ## Pages (matching the wireframes)
 
@@ -54,7 +79,10 @@ The redirect URI must match exactly in Google Cloud Console and `config.local.ph
 |---|---|
 | Home: filters, fresh finds, AI picks | `index.php` |
 | Product detail, message seller, report | `listing.php` |
+<<<<<<< HEAD
 | My Purchases and order sections | `purchases.php` |
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 | Seller profile & reviews | `seller.php` |
 | Sell a product (+ AI selling assistant) | `sell.php` |
 | Create profile + face verification | `register.php` |
@@ -66,6 +94,7 @@ The redirect URI must match exactly in Google Cloud Console and `config.local.ph
 | Admin workspace | `admin/index.php` |
 | Guidelines, privacy, help | `guidelines.php`, `privacy.php`, `help.php` |
 
+<<<<<<< HEAD
 ## Code layout
 
 - `*.php` at the project root are public page and compatibility entry points.
@@ -84,6 +113,15 @@ Legacy names such as `products.php`, `profile.php`, `product.php`, and `admin.ph
 22 tables + 1 view, InnoDB, utf8mb4, foreign keys and CHECK constraints.
 Groups: people & trust (`towns`, `users`, `face_verifications`), catalogue (`categories`, `listings`, `listing_photos`, `listing_moderations`),
 buying (`conversations`, `messages`, `purchases`, `deals`, `reviews`, `product_views`), safety (`guidelines`, `reports`, `report_attachments`),
+=======
+Code layout: `src/Repository` (all SQL), `src/Service` (auth, uploads, AI, face check), `views/` (templates), `assets/` (CSS/JS), `api/` (JSON endpoints).
+
+## Database
+
+21 tables + 1 view, InnoDB, utf8mb4, foreign keys and CHECK constraints.
+Groups: people & trust (`towns`, `users`, `face_verifications`), catalogue (`categories`, `listings`, `listing_photos`, `listing_moderations`),
+buying (`conversations`, `messages`, `deals`, `reviews`, `product_views`), safety (`guidelines`, `reports`, `report_attachments`),
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 support (`support_tickets`, `support_messages`), system (`notifications`, `admin_actions`, `login_attempts`), and the view `v_user_ratings`.
 The script is re-runnable (`IF NOT EXISTS`, `INSERT IGNORE`).
 
@@ -95,7 +133,13 @@ The script is re-runnable (`IF NOT EXISTS`, `INSERT IGNORE`).
   Admins can manually verify a member from a customer-service request if the camera step fails.
 - **The "AI" runs locally, no API key.** Category detection uses keywords from the title, description and photo file names (it does not look at image pixels).
   Price ranges come from comparable listings already on the site. The assistant answers from site data and rules. All can be upgraded to a real LLM later.
+<<<<<<< HEAD
 - **No online payments or delivery**: buyers and sellers arrange local pickup directly. Buy Now reserves one stock unit, and buyers manage receipt, review, and cancellation from My Purchases. No emails are sent (XAMPP has no mail server); seller updates appear in the in-site message inbox.
 - The Privacy page is starter text. Face images are biometric data, so have it reviewed against the Philippine Data Privacy Act before public launch.
 - Keep `app_debug` set to `false` in `config.local.php` on any public server (this is also the default).
+=======
+- **No payments or delivery**: buyers and sellers meet locally, as in the wireframes. No emails are sent (XAMPP has no mail server); updates appear as in-site notifications.
+- The Privacy page is starter text. Face images are biometric data, so have it reviewed against the Philippine Data Privacy Act before public launch.
+- Set `APP_DEBUG` to `false` in `config.php` on any public server.
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 - Reference face images and report evidence are stored in `storage/` (blocked from the web by `.htaccess`); listing photos in `uploads/`.

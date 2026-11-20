@@ -59,10 +59,18 @@ final class AssistantService
                 [], [['Sell a product', 'sell.php'], ['Seller guidelines', 'guidelines.php']]
             );
         }
+<<<<<<< HEAD
         if (preg_match('/\b(register|sign ?up|create (an )?account|verify|verification)\b/', $q)) {
             return $this->say(
                 "Create your profile with your name, username, email, password and town. Verified email accounts can message sellers, sell, and leave ratings. You can always browse as a guest.",
                 [], [['Create a profile', 'register.php'], ['Contact customer service', 'support.php']]
+=======
+        if (preg_match('/\b(register|sign ?up|create (an )?account|verify|verification|face|camera)\b/', $q)) {
+            return $this->say(
+                "Create your profile with your name, email, password and town. Then complete face verification: allow camera access, face the camera in good lighting and follow the on-screen instructions. "
+                . "A verified profile lets you message sellers, sell, and leave ratings. You can always browse as a guest. If the camera step fails, contact customer service.",
+                [], [['Create a profile', 'register.php'], ['Contact customer service', 'support.php?topic=face_verification']]
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             );
         }
         if (preg_match('/\b(message|chat|contact (the )?seller|talk to (the )?seller)\b/', $q)) {
@@ -177,7 +185,11 @@ final class AssistantService
             $text .= $r['seller']['count'] > 0
                 ? 'Rated ' . number_format((float) $r['seller']['avg'], 1) . ' / 5 from ' . $r['seller']['count'] . ' seller review' . ($r['seller']['count'] === 1 ? '' : 's') . '.'
                 : 'They have no seller reviews yet.';
+<<<<<<< HEAD
             return $this->say($text, [], [['View profile & reviews', 'seller.php?id=' . (int) $l['seller_id']]]);
+=======
+            return $this->say($text, [], [['View profile & reviews', 'profile.php?id=' . (int) $l['seller_id']]]);
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         }
         if (preg_match('/\b(condition|used|defect|working|works|damage|scratch|quality)\b/', $q)) {
             return $this->say(
@@ -261,7 +273,11 @@ final class AssistantService
             'title' => (string) $l['title'],
             'price' => money($l['price']),
             'meta' => $l['town_name'] . ' · ' . condition_label($l['item_condition']),
+<<<<<<< HEAD
             'url' => url('listing.php?id=' . (int) $l['id']),
+=======
+            'url' => url('product.php?id=' . (int) $l['id']),
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         ];
     }
 

@@ -26,9 +26,12 @@ $statusNote = match ($listing['status']) {
     'removed' => 'This listing was removed for breaking the community guidelines.',
     default => '',
 };
+<<<<<<< HEAD
 if ($listing['status'] === 'approved' && (int) $listing['stock'] <= 0) {
     $statusNote = 'This item is out of stock.';
 }
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 ?>
 <div class="wrap">
     <nav class="breadcrumb hide-mobile" aria-label="Breadcrumb">
@@ -67,6 +70,7 @@ if ($listing['status'] === 'approved' && (int) $listing['stock'] <= 0) {
             <p class="eyebrow"><?= e(mb_strtoupper(trim(($listing['parent_name'] ?? 'Listing') . ' · ' . condition_label($listing['item_condition']), ' ·'))) ?></p>
             <h1 class="h1 detail-title"><?= e($listing['title']) ?></h1>
             <p class="price"><?= e(money($listing['price'])) ?></p>
+<<<<<<< HEAD
             <p class="small muted">
                 <?php if ($listing['status'] === 'approved'): ?>
                     <?= (int) $listing['stock'] > 0 ? (int) $listing['stock'] . ' in stock' : 'Out of stock' ?>
@@ -74,16 +78,27 @@ if ($listing['status'] === 'approved' && (int) $listing['stock'] <= 0) {
                     <?= e(listing_status_label($listing['status'])) ?>
                 <?php endif; ?>
             </p>
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             <p class="muted small"><?= e(town_label($listing['town_name'])) ?><?= $listing['published_at'] ? ' · Posted ' . e(time_ago($listing['published_at'])) : '' ?></p>
             <p class="desc"><?= nl2br(e($listing['description'])) ?></p>
 
             <div class="btn-row">
+<<<<<<< HEAD
+=======
+                <?php if ($verified): ?><span class="tag">Face-verified seller</span><?php endif; ?>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                 <?php if (!$isOwner && $listing['status'] !== 'draft'): ?><a class="btn hide-mobile" href="#report">Report listing</a><?php endif; ?>
             </div>
 
             <div class="btn-row">
                 <?php if ($state === 'guest'): ?>
                     <a class="btn btn-primary btn-mblock" href="<?= e(url('login.php?next=' . rawurlencode($self))) ?>">Message seller</a>
+<<<<<<< HEAD
+=======
+                <?php elseif ($state === 'unverified'): ?>
+                    <a class="btn btn-primary btn-mblock" href="<?= e(url('register.php?step=verify&next=' . rawurlencode($self))) ?>">Message seller</a>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                 <?php elseif ($state === 'owner'): ?>
                     <span class="btn btn-disabled btn-mblock">This is your listing</span>
                 <?php elseif ($state === 'unavailable'): ?>
@@ -93,6 +108,7 @@ if ($listing['status'] === 'approved' && (int) $listing['stock'] <= 0) {
                 <?php endif; ?>
             </div>
             <?php if ($state === 'guest'): ?><p class="small muted">Sign in to message. Guests can browse all listings.</p><?php endif; ?>
+<<<<<<< HEAD
             <p class="small muted">Meet locally in a public place. Inspect before paying.</p>
         </div>
     </div>
@@ -115,6 +131,12 @@ if ($listing['status'] === 'approved' && (int) $listing['stock'] <= 0) {
                 <span class="btn btn-disabled"><?= (int) $listing['stock'] <= 0 ? 'Out of stock' : ($listing['status'] === 'sold' ? 'Sold' : 'Not available') ?></span>
             <?php endif; ?>
     </div>
+=======
+            <?php if ($state === 'unverified'): ?><p class="small muted">Finish face verification to message sellers.</p><?php endif; ?>
+            <p class="small muted">Meet locally in a public place. Inspect before paying.</p>
+        </div>
+    </div>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 </div>
 
 <section class="band">
@@ -146,6 +168,7 @@ if ($listing['status'] === 'approved' && (int) $listing['stock'] <= 0) {
         <div class="panel message-panel" id="message">
             <div class="panel-head">
                 <h2 class="h2"><span class="hide-mobile">Message <?= e($sellerFirst) ?></span><span class="m-only">Conversation with <?= e($sellerFirst) ?></span></h2>
+<<<<<<< HEAD
             </div>
 
             <?php if ($state === 'guest' || $state === 'unverified'): ?>
@@ -153,6 +176,18 @@ if ($listing['status'] === 'approved' && (int) $listing['stock'] <= 0) {
                     <p class="muted">Sign in to message <?= e($sellerFirst) ?>.</p>
                     <a class="btn btn-primary" href="<?= e(url('login.php?next=' . rawurlencode($self))) ?>">Sign in</a>
                 <?php endif; ?>
+=======
+                <?php if ($state === 'guest' || $state === 'unverified'): ?><span class="eyebrow">SIGNED-IN PREVIEW</span><?php endif; ?>
+            </div>
+
+            <?php if ($state === 'guest' || $state === 'unverified'): ?>
+                <div class="bubble bubble-them"><span class="who"><?= e($sellerFirst) ?> · Seller</span>Hi! Yes, it’s still available. You can inspect it before buying.</div>
+                <div class="bubble bubble-me"><span class="who">You · Buyer</span>Great! Could we meet near the town plaza?</div>
+                <div class="compose">
+                    <div class="field grow"><label>Your message</label><input type="text" placeholder="Type a message…" disabled></div>
+                    <a class="btn btn-primary" href="<?= e($state === 'guest' ? url('login.php?next=' . rawurlencode($self)) : url('register.php?step=verify&next=' . rawurlencode($self))) ?>"><?= $state === 'guest' ? 'Sign in' : 'Verify' ?></a>
+                </div>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             <?php elseif ($state === 'owner'): ?>
                 <p class="muted">This is your listing. Buyers’ messages appear in your inbox.</p>
                 <a class="btn" href="<?= e(url('messages.php')) ?>">Open my messages</a>

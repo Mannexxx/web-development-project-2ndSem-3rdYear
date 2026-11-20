@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /storage/evidence/*
 !/storage/evidence/.gitkeep
 /storage/faces/*
@@ -6,3 +7,11 @@
 !/uploads/listings/.gitkeep
 /config.local.php
 /vendor/
+=======
+/storage/evidence/*
+!/storage/evidence/.gitkeep
+/storage/faces/*
+!/storage/faces/.gitkeep
+/uploads/listings/*
+!/uploads/listings/.gitkeep
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073

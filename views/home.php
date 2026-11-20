@@ -20,7 +20,11 @@ $hasFilters = $sel['q'] !== '' || $sel['category'] !== '' || $sel['town'] || $se
         <div class="hero-top">
             <span class="eyebrow">BANTAYAN ISLAND, CEBU</span>
             <span class="muted small hide-mobile">
+<<<<<<< HEAD
                 <?= $me ? 'Signed in as ' . e($me['firstname']) : 'Browsing as a guest' ?>
+=======
+                <?= $me ? 'Signed in as ' . e($me['firstname']) : 'Browsing as a guest · No account needed' ?>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             </span>
         </div>
         <h1 class="hero-title">Your island.<br class="m-only"> Your marketplace.</h1>

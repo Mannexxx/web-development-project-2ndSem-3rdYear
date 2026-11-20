@@ -7,13 +7,17 @@ require_once __DIR__ . '/config.php';
 use App\Repository\TownRepository;
 use App\Repository\UserRepository;
 use App\Service\AuthService;
+<<<<<<< HEAD
 use App\Service\VerificationService;
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 $towns = repo(TownRepository::class)->all();
 $next = safe_next($_POST['next'] ?? $_GET['next'] ?? '', '');
 $me = current_user();
 $errors = [];
 $old = [];
+<<<<<<< HEAD
 $verificationError = null;
 $verificationSent = false;
 $verificationChannel = 'email';
@@ -50,6 +54,15 @@ if ($me !== null) {
     if ($alreadyVerified && $step === 'verify_contact') {
         redirect($next !== '' ? $next : 'index.php');
     }
+=======
+
+if ($me !== null) {
+    if (is_verified($me) || is_admin($me)) {
+        flash('info', 'Your profile is already verified.');
+        redirect($next !== '' ? $next : 'index.php');
+    }
+    $step = 'verify';
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 } else {
     $step = 'create';
     if (is_post()) {
@@ -58,6 +71,7 @@ if ($me !== null) {
         $auth = new AuthService(repo(UserRepository::class), repo(TownRepository::class));
         $result = $auth->register($_POST);
         if ($result['errors'] === []) {
+<<<<<<< HEAD
             $fresh = repo(UserRepository::class)->find((int) $result['user_id']);
             if ($fresh === null) {
                 throw new \RuntimeException('The newly created account could not be loaded.');
@@ -76,11 +90,17 @@ if ($me !== null) {
                 flash('success', 'Account created. Sign in to verify your email.');
             }
             redirect('login.php' . ($next !== '' ? '?next=' . rawurlencode($next) : ''));
+=======
+            AuthService::signIn((int) $result['user_id']);
+            flash('success', 'Account created. Complete face verification to message sellers and sell.');
+            redirect('register.php?step=verify' . ($next !== '' ? '&next=' . rawurlencode($next) : ''));
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         }
         $errors = $result['errors'];
     }
 }
 
+<<<<<<< HEAD
 if ($me === null) {
     render('login', [
         'error' => null,
@@ -114,5 +134,13 @@ render('register', [
     'title' => 'Verify your account · ' . APP_NAME,
     'tab' => 'profile',
     'hide_header' => true,
+=======
+render('register', [
+    'step' => $step, 'towns' => $towns, 'errors' => $errors, 'old' => $old, 'next' => $next,
+], [
+    'title' => 'Join the island community · ' . APP_NAME,
+    'tab' => 'profile',
+    'scripts' => ['face.js'],
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     'footer' => ['text' => 'Bantayan Marketplace', 'slashes' => true, 'links' => [['Privacy & verification', 'privacy.php#verification'], ['Community guidelines', 'guidelines.php'], ['Contact admin', 'support.php']]],
 ]);

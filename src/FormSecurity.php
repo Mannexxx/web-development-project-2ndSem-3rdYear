@@ -28,11 +28,19 @@ final class FormSecurity
         if (!is_string($candidate)) {
             return 'index.php';
         }
+<<<<<<< HEAD
         if (in_array($candidate, ['index.php', 'sell.php', 'messages.php', 'admin/index.php'], true)) {
             return $candidate;
         }
         if (preg_match('/\Aproduct\.php\?id=([1-9][0-9]*)\z/', $candidate, $matches)) {
             return 'listing.php?id=' . $matches[1];
+=======
+        if (in_array($candidate, ['index.php', 'sell.php', 'messages.php', 'admin.php'], true)) {
+            return $candidate;
+        }
+        if (preg_match('/\Aproduct\.php\?id=([1-9][0-9]*)\z/', $candidate, $matches)) {
+            return 'product.php?id=' . $matches[1];
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         }
         return 'index.php';
     }

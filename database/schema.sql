@@ -1,10 +1,21 @@
 -- =====================================================================
 --  BANTAYAN MARKETPLACE  -  database schema
+<<<<<<< HEAD
 --  Target : MySQL / MariaDB                         Engine : InnoDB
 --  Charset: utf8mb4 / utf8mb4_unicode_ci
 --
 --  Select an empty database in phpMyAdmin before importing this file.
 --  Create the database in your hosting control panel first when required.
+=======
+--  Target : MySQL 8 / MariaDB 10.4+  (XAMPP)      Engine : InnoDB
+--  Charset: utf8mb4 / utf8mb4_unicode_ci
+--
+--  HOW TO IMPORT (XAMPP)
+--    1. Start Apache + MySQL in the XAMPP Control Panel.
+--    2. Open http://localhost/phpmyadmin  ->  "Import"  ->  choose this file  ->  Go.
+--       (the script creates the database `bantayan_market` for you)
+--    3. OPTIONAL: import database/sample_data.sql afterwards for demo content.
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 --
 --  The script is safe to run more than once: tables use IF NOT EXISTS and
 --  seed rows use INSERT IGNORE, so existing data is never overwritten.
@@ -12,6 +23,7 @@
 --  TABLE MAP
 --    People & trust : towns, users, face_verifications
 --    Catalogue      : categories, listings, listing_photos, listing_moderations
+<<<<<<< HEAD
 --    Buying         : conversations, messages, purchases, deals, reviews, product_views
 --    Safety         : guidelines, reports, report_attachments
 --    Support        : support_tickets, support_messages
@@ -19,6 +31,21 @@
 --    Ratings        : calculated directly from reviews (no database view required)
 -- =====================================================================
 
+=======
+--    Buying         : conversations, messages, deals, reviews, product_views
+--    Safety         : guidelines, reports, report_attachments
+--    Support        : support_tickets, support_messages
+--    System         : notifications, admin_actions, login_attempts
+--    View           : v_user_ratings (average rating per user and role)
+-- =====================================================================
+
+CREATE DATABASE IF NOT EXISTS `bantayan_market`
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;
+
+USE `bantayan_market`;
+
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 SET NAMES utf8mb4;
 
 -- ---------------------------------------------------------------------
@@ -40,6 +67,7 @@ CREATE TABLE IF NOT EXISTS users (
   id                 INT UNSIGNED NOT NULL AUTO_INCREMENT,
   firstname          VARCHAR(80)  NOT NULL,
   lastname           VARCHAR(80)  NOT NULL,
+<<<<<<< HEAD
   username           VARCHAR(40)  NULL,
   email              VARCHAR(190) NULL,
   phone              VARCHAR(32)  NULL,
@@ -50,6 +78,13 @@ CREATE TABLE IF NOT EXISTS users (
   town_id            INT UNSIGNED NOT NULL,
   role               ENUM('member','admin')      NOT NULL DEFAULT 'member',
   status             ENUM('active','restricted','deactivated') NOT NULL DEFAULT 'active',
+=======
+  email              VARCHAR(190) NOT NULL,
+  password_hash      VARCHAR(255) NOT NULL,
+  town_id            INT UNSIGNED NOT NULL,
+  role               ENUM('member','admin')      NOT NULL DEFAULT 'member',
+  status             ENUM('active','restricted') NOT NULL DEFAULT 'active',
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   violation_count    INT UNSIGNED NOT NULL DEFAULT 0,
   profile_pic        VARCHAR(255) NULL,
   terms_accepted_at  DATETIME     NOT NULL,
@@ -58,13 +93,18 @@ CREATE TABLE IF NOT EXISTS users (
   created_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+<<<<<<< HEAD
   UNIQUE KEY uq_users_username (username),
   UNIQUE KEY uq_users_email (email),
   UNIQUE KEY uq_users_phone (phone),
+=======
+  UNIQUE KEY uq_users_email (email),
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   KEY idx_users_town (town_id),
   CONSTRAINT fk_users_town FOREIGN KEY (town_id) REFERENCES towns (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+<<<<<<< HEAD
 CREATE TABLE IF NOT EXISTS verification_codes (
   id             INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id        INT UNSIGNED NOT NULL,
@@ -80,6 +120,8 @@ CREATE TABLE IF NOT EXISTS verification_codes (
   CONSTRAINT fk_verification_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 -- One row per face-verification attempt (the latest success sets users.face_verified_at)
 CREATE TABLE IF NOT EXISTS face_verifications (
   id               INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -124,7 +166,10 @@ CREATE TABLE IF NOT EXISTS listings (
   title            VARCHAR(150) NOT NULL,
   description      TEXT         NOT NULL,
   price            DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+<<<<<<< HEAD
   stock            INT UNSIGNED NOT NULL DEFAULT 1,
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   item_condition   ENUM('new','like_new','used') NULL,
   status           ENUM('draft','pending','changes_requested','approved','rejected','removed','sold')
                    NOT NULL DEFAULT 'draft',
@@ -139,7 +184,10 @@ CREATE TABLE IF NOT EXISTS listings (
   KEY idx_listings_town (town_id),
   KEY idx_listings_seller (seller_id, status),
   KEY idx_listings_price (price),
+<<<<<<< HEAD
   KEY idx_listings_stock (status, stock),
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   CONSTRAINT chk_listings_price CHECK (price >= 0),
   CONSTRAINT fk_listings_seller   FOREIGN KEY (seller_id)   REFERENCES users (id),
   CONSTRAINT fk_listings_category FOREIGN KEY (category_id) REFERENCES categories (id),
@@ -206,6 +254,7 @@ CREATE TABLE IF NOT EXISTS messages (
   CONSTRAINT fk_messages_sender       FOREIGN KEY (sender_id)       REFERENCES users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+<<<<<<< HEAD
 -- A buyer order for one unit of a listing. Stock is reserved at purchase time.
 CREATE TABLE IF NOT EXISTS purchases (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -231,18 +280,31 @@ CREATE TABLE IF NOT EXISTS purchases (
 CREATE TABLE IF NOT EXISTS deals (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
   purchase_id   INT UNSIGNED NULL,
+=======
+-- A completed sale (a listing can be sold only once). Ratings hang off a deal,
+-- so every review is a "verified transaction".
+CREATE TABLE IF NOT EXISTS deals (
+  id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   listing_id    INT UNSIGNED NOT NULL,
   buyer_id      INT UNSIGNED NOT NULL,
   seller_id     INT UNSIGNED NOT NULL,
   completed_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+<<<<<<< HEAD
   UNIQUE KEY uq_deals_purchase (purchase_id),
   KEY idx_deals_listing (listing_id),
+=======
+  UNIQUE KEY uq_deals_listing (listing_id),
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   KEY idx_deals_buyer (buyer_id),
   KEY idx_deals_seller (seller_id),
   CONSTRAINT chk_deals_parties CHECK (buyer_id <> seller_id),
   CONSTRAINT fk_deals_listing FOREIGN KEY (listing_id) REFERENCES listings (id),
+<<<<<<< HEAD
   CONSTRAINT fk_deals_purchase FOREIGN KEY (purchase_id) REFERENCES purchases (id),
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   CONSTRAINT fk_deals_buyer   FOREIGN KEY (buyer_id)   REFERENCES users (id),
   CONSTRAINT fk_deals_seller  FOREIGN KEY (seller_id)  REFERENCES users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -414,7 +476,25 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------
+<<<<<<< HEAD
 --  7. REQUIRED SEED DATA
+=======
+--  7. VIEW: average rating per user, split by role
+--     as_role = 'seller' -> reviews the user received while selling
+--     as_role = 'buyer'  -> reviews the user received while buying
+-- ---------------------------------------------------------------------
+
+CREATE OR REPLACE VIEW v_user_ratings AS
+SELECT reviewee_id AS user_id,
+       CASE reviewer_role WHEN 'buyer' THEN 'seller' ELSE 'buyer' END AS as_role,
+       COUNT(*)            AS review_count,
+       ROUND(AVG(rating), 1) AS avg_rating
+FROM reviews
+GROUP BY reviewee_id, reviewer_role;
+
+-- ---------------------------------------------------------------------
+--  8. REQUIRED SEED DATA
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 -- ---------------------------------------------------------------------
 
 INSERT IGNORE INTO towns (name, slug) VALUES
@@ -494,3 +574,12 @@ INSERT IGNORE INTO guidelines (code, title, body, audience, sort_order) VALUES
    'Treat other members politely. Harassment, hate speech and threats lead to account restrictions.', 'everyone', 7),
   ('respect-privacy',   'Respect privacy',
    'Do not share other people''s personal information or photos without their permission.', 'everyone', 8);
+<<<<<<< HEAD
+=======
+
+-- Default administrator.  Email: admin@bantayan.local   Password: Admin@12345
+-- >>> CHANGE THIS PASSWORD after your first sign-in (or replace the row). <<<
+INSERT IGNORE INTO users (firstname, lastname, email, password_hash, town_id, role, terms_accepted_at)
+  SELECT 'Admin', 'Bantayan', 'admin@bantayan.local', '$2y$10$kthFLEZ1Og61A0/kFVdcxuJcEtCSpaiGIW857b4ObIy1dYmV7WUmi', t.id, 'admin', CURRENT_TIMESTAMP
+  FROM towns t WHERE t.slug = 'bantayan';
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
