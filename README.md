@@ -36,6 +36,20 @@ Users may register with an email address or Philippine mobile number. Email and 
 For databases created before carrier selection was added, run `database/migrations/20261119_add_phone_carrier.sql` once in phpMyAdmin. New databases get the carrier field from either schema SQL file.
 For existing databases, run `database/migrations/20261120_add_deactivated_account_status.sql` once to enable account deactivation. Run `database/migrations/20261120_add_listing_stock_and_purchases.sql` once to add listing inventory and buyer orders. New databases get these features from either schema SQL file.
 For existing databases, run `database/migrations/20261120_add_seller_background.sql` once to enable seller profile background images. New databases get the field from either schema SQL file.
+For existing databases, run `database/migrations/20261121_add_seller_applications.sql` once to add seller applications and Didit webhook tracking. New databases get these tables from either schema SQL file.
+
+## Seller identity verification
+
+Seller access requires both a successful Didit identity check and admin approval. Applicants provide their legal name, sex, date of birth (older than 18), address, ID type, and front/back ID images, and separately consent to biometric face processing. The application form stays unavailable until Didit is configured, so documents are not collected before the verification flow is ready. The app stores ID images only in private `storage/` and schedules their deletion 30 days after the final admin decision; the admin and seller application pages also purge expired files when visited. Configure a daily scheduled run of `php cli/purge-seller-documents.php` for reliable cleanup when the site is quiet. Face verification itself is hosted by Didit; the marketplace stores only the session ID and status.
+
+To configure Didit:
+
+1. In the Didit console, create a **User/KYC** workflow that requires government-ID verification, face liveness, and face match. Use the same sandbox/live environment as the API key.
+2. Create a webhook destination pointing to `https://YOUR-DOMAIN/marketplace/api/didit-webhook.php`, subscribe to `status.updated`, and use webhook version `v3`. Keep the destination signing secret private.
+3. In `config.local.php`, set `didit_api_key`, `didit_workflow_id`, `didit_webhook_secret`, and `didit_callback_url` (the callback must be a public HTTPS URL and its origin must be allowed in Didit). Environment-variable equivalents are `DIDIT_API_KEY`, `DIDIT_WORKFLOW_ID`, `DIDIT_WEBHOOK_SECRET`, and `DIDIT_CALLBACK_URL`.
+4. Ensure PHP cURL is enabled. Test with Didit's sandbox before using a live key. The server verifies webhook signatures and timestamps; it does not trust the browser callback as proof of approval.
+
+The applicant's locally uploaded ID images are for admin review; Didit's hosted flow separately collects the documents and face data needed for its verification workflow. Read the updated Privacy page and have the biometric-consent language and retention practices reviewed for applicable privacy laws before production.
 
 ## Google sign-in
 
@@ -58,6 +72,7 @@ The redirect URI must match exactly in Google Cloud Console and `config.local.ph
 | My Purchases and order sections | `purchases.php` |
 | Seller profile & reviews | `seller.php` |
 | Sell a product (+ AI selling assistant) | `sell.php` |
+| Seller application and Didit verification | `seller-application.php` |
 | Create profile + face verification | `register.php` |
 | Sign in / out | `login.php`, `logout.php` |
 | Messages, mark as sold, rate | `messages.php` |
@@ -82,21 +97,19 @@ Legacy names such as `products.php`, `profile.php`, `product.php`, and `admin.ph
 
 ## Database
 
-22 tables + 1 view, InnoDB, utf8mb4, foreign keys and CHECK constraints.
-Groups: people & trust (`towns`, `users`, `face_verifications`), catalogue (`categories`, `listings`, `listing_photos`, `listing_moderations`),
+24 tables + 1 view, InnoDB, utf8mb4, foreign keys and CHECK constraints.
+Groups: people & trust (`towns`, `users`, `face_verifications`, `seller_applications`), catalogue (`categories`, `listings`, `listing_photos`, `listing_moderations`),
 buying (`conversations`, `messages`, `purchases`, `deals`, `reviews`, `product_views`), safety (`guidelines`, `reports`, `report_attachments`),
-support (`support_tickets`, `support_messages`), system (`notifications`, `admin_actions`, `login_attempts`), and the view `v_user_ratings`.
+support (`support_tickets`, `support_messages`), system (`notifications`, `admin_actions`, `didit_webhook_events`, `login_attempts`), and the view `v_user_ratings`.
 The script is re-runnable (`IF NOT EXISTS`, `INSERT IGNORE`).
 
 ## Honest notes
 
 - The site asks for confirmation before logging out and consequential actions such as submitting listings or reports, capturing face-verification frames, submitting ratings, making moderation decisions, and removing listing photos or listings.
-- **Face verification is a basic check, not face recognition.** It confirms three camera frames arrive, are lit, and change between frames (head movement).
-  It does not match a face to a person. `src/Service/FaceVerifier.php` is the one place to swap in a real provider. The camera needs `localhost` or HTTPS.
-  Admins can manually verify a member from a customer-service request if the camera step fails.
+- **The old account camera check is only a basic liveness heuristic, not face recognition.** It must not be used to approve sellers. Seller onboarding uses the configured Didit workflow; selling remains disabled until its result is approved and an admin approves the application.
 - **The "AI" runs locally, no API key.** Category detection uses keywords from the title, description and photo file names (it does not look at image pixels).
   Price ranges come from comparable listings already on the site. The assistant answers from site data and rules. All can be upgraded to a real LLM later.
 - **No online payments or delivery**: buyers and sellers arrange local pickup directly. Buy Now reserves one stock unit, and buyers manage receipt, review, and cancellation from My Purchases. No emails are sent (XAMPP has no mail server); seller updates appear in the in-site message inbox.
-- The Privacy page is starter text. Face images are biometric data, so have it reviewed against the Philippine Data Privacy Act before public launch.
+- The Privacy page is starter text. Seller applications and face data are sensitive; have the full process reviewed against applicable privacy laws before public launch.
 - Keep `app_debug` set to `false` in `config.local.php` on any public server (this is also the default).
 - Reference face images and report evidence are stored in `storage/` (blocked from the web by `.htaccess`); listing photos in `uploads/`.

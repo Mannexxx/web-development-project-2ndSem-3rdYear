@@ -80,6 +80,12 @@ final class UploadService
         ];
     }
 
+    public function saveSellerIdImage(array $file): string
+    {
+        [$mime] = $this->validate($file, self::IMAGE_TYPES, true);
+        return $this->store($file, 'storage/seller-applications', self::IMAGE_TYPES[$mime]);
+    }
+
     public function saveFaceImage(string $bytes): string
     {
         $dir = APP_ROOT . '/storage/faces';

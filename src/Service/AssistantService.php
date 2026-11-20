@@ -53,15 +53,15 @@ final class AssistantService
         }
         if (preg_match('/\b(sell|selling|post|posting|list (my|an|a)|upload)\b/', $q) && !preg_match('/\b(seller|sold)\b/', $q)) {
             return $this->say(
-                "To sell: 1) Sign in with a face-verified profile. 2) Tap \"Sell a product\" and upload up to 8 clear photos (JPG or PNG, max 5 MB each). "
-                . "3) Add the title, category, condition, description, price and pickup location. The selling assistant can suggest a category, a better listing text and a fair price. "
-                . "4) Submit for review. An admin checks it against the community guidelines and you receive a status update.",
-                [], [['Sell a product', 'sell.php'], ['Seller guidelines', 'guidelines.php']]
+                "To sell: 1) Sign in and submit the seller application with your legal details and ID. 2) Complete Didit face and ID verification and wait for admin approval. 3) Tap \"Sell a product\" to list items. "
+                . "4) Add the title, category, condition, description, price and pickup location. The selling assistant can suggest a category, a better listing text and a fair price. "
+                . "5) Submit for review. An admin checks it against the community guidelines and you receive a status update.",
+                [], [['Seller application', 'seller-application.php'], ['Seller guidelines', 'guidelines.php']]
             );
         }
         if (preg_match('/\b(register|sign ?up|create (an )?account|verify|verification)\b/', $q)) {
             return $this->say(
-                "Create your profile with your name, username, email, password and town. Verified email accounts can message sellers, sell, and leave ratings. You can always browse as a guest.",
+                "Create your profile with your name, username, email, password and town. Verified email accounts can message sellers and leave ratings. Selling also requires Didit identity verification and admin approval. You can always browse as a guest.",
                 [], [['Create a profile', 'register.php'], ['Contact customer service', 'support.php']]
             );
         }

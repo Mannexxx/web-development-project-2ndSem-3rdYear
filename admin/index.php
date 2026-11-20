@@ -10,8 +10,11 @@ use App\Repository\GuidelineRepository;
 use App\Repository\ListingRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\ReportRepository;
+use App\Repository\SellerApplicationRepository;
 use App\Repository\SupportRepository;
 use App\Repository\UserRepository;
+use App\Service\SellerDocumentRetentionService;
+use App\Service\UploadService;
 
 $admin = require_admin();
 $aid = (int) $admin['id'];
@@ -23,8 +26,10 @@ $guidelines = repo(GuidelineRepository::class);
 $notes = repo(NotificationRepository::class);
 $audit = repo(AuditRepository::class);
 $users = repo(UserRepository::class);
+$sellerApplications = repo(SellerApplicationRepository::class);
+(new SellerDocumentRetentionService($sellerApplications, new UploadService()))->purgeExpired();
 
-$tabs = ['moderation', 'reports', 'support', 'guidelines'];
+$tabs = ['moderation', 'reports', 'support', 'guidelines', 'sellers'];
 $tabRaw = (string) ($_GET['tab'] ?? $_POST['tab'] ?? '');
 $tab = in_array($tabRaw, $tabs, true) ? $tabRaw : 'moderation';
 
@@ -36,6 +41,55 @@ function admin_url(string $tab, array $extra = []): string
 if (is_post()) {
     verify_csrf();
     $action = (string) ($_POST['action'] ?? '');
+
+    if ($action === 'seller_decision') {
+        $application = $sellerApplications->find((int) ($_POST['application_id'] ?? 0));
+        $decision = (string) ($_POST['decision'] ?? '');
+        $note = trim((string) ($_POST['note'] ?? ''));
+        $back = admin_url('sellers', ['application' => (int) ($_POST['application_id'] ?? 0)]);
+        if ($application === null || !in_array($application['status'], ['pending', 'changes_requested'], true)) {
+            flash('error', 'That seller application is no longer waiting for review.');
+            redirect(admin_url('sellers'));
+        }
+        if (!in_array($decision, ['approve', 'changes', 'reject'], true)) {
+            flash('error', 'Unknown seller application decision.');
+            redirect($back);
+        }
+        if ($decision === 'approve' && ($application['didit_status'] !== 'Approved'
+            || empty($application['id_front_path']) || empty($application['id_back_path'])
+            || !is_file(APP_ROOT . '/' . $application['id_front_path'])
+            || !is_file(APP_ROOT . '/' . $application['id_back_path']))) {
+            flash('error', 'A successful Didit identity check and both ID images are required before approval.');
+            redirect($back);
+        }
+        if ($decision !== 'approve' && mb_strlen($note) < 3) {
+            flash('error', 'Add a short reason so the applicant knows what to fix.');
+            redirect($back);
+        }
+        if (mb_strlen($note) > 1000) {
+            flash('error', 'Please keep the note under 1000 characters.');
+            redirect($back);
+        }
+
+        $status = match ($decision) {
+            'approve' => 'approved',
+            'changes' => 'changes_requested',
+            default => 'rejected',
+        };
+        $retainUntil = in_array($status, ['approved', 'rejected'], true)
+            ? (new DateTimeImmutable('now'))->modify('+30 days')->format('Y-m-d H:i:s')
+            : null;
+        $sellerApplications->decide((int) $application['id'], $aid, $status, $note, $retainUntil);
+        $audit->record($aid, 'seller_application_' . $status, 'seller_application', (int) $application['id'], $note);
+        $message = match ($status) {
+            'approved' => 'Your seller application was approved. You can now create listings.',
+            'changes_requested' => 'The admin team requested changes to your seller application: ' . $note,
+            default => 'Your seller application was not approved: ' . $note,
+        };
+        $notes->create((int) $application['user_id'], 'verification', 'Seller application update', $message, 'seller-application.php');
+        flash('success', 'Seller application decision saved.');
+        redirect(admin_url('sellers'));
+    }
 
     /* ---- product moderation ------------------------------------------------ */
     if ($action === 'moderate') {
@@ -222,6 +276,7 @@ if (is_post()) {
 
 /* ---- page data -------------------------------------------------------------------- */
 $pending = $listings->pending();
+$pendingSellerApplications = $sellerApplications->pending();
 $openReports = $reports->open();
 $openTickets = $support->open();
 
@@ -241,6 +296,8 @@ $ticketId = (int) ($_GET['ticket'] ?? 0);
 $ticket = $ticketId > 0 ? $support->find($ticketId) : ($openTickets ? $support->find((int) $openTickets[0]['id']) : null);
 
 $editGuideline = isset($_GET['edit']) ? $guidelines->find((int) $_GET['edit']) : null;
+$sellerApplicationId = (int) ($_GET['application'] ?? 0);
+$sellerApplication = $sellerApplicationId > 0 ? $sellerApplications->find($sellerApplicationId) : ($pendingSellerApplications ? $sellerApplications->find((int) $pendingSellerApplications[0]['id']) : null);
 
 render('admin', [
     'tab' => $tab,
@@ -259,4 +316,6 @@ render('admin', [
     'guidelinesAll' => $guidelines->allIncludingInactive(),
     'activeGuidelines' => $guidelines->active(),
     'editGuideline' => $editGuideline,
+    'pendingSellerApplications' => $pendingSellerApplications,
+    'sellerApplication' => $sellerApplication,
 ], ['title' => 'Admin workspace · ' . APP_NAME, 'chrome' => 'admin']);

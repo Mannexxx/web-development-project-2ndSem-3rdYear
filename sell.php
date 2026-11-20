@@ -6,11 +6,19 @@ require_once __DIR__ . '/config.php';
 
 use App\Repository\CategoryRepository;
 use App\Repository\ListingRepository;
+use App\Repository\SellerApplicationRepository;
 use App\Repository\TownRepository;
 use App\Service\UploadService;
 
 $me = require_verified('sell a product');
 $uid = (int) $me['id'];
+if (!is_admin($me)) {
+    $sellerApplication = repo(SellerApplicationRepository::class)->forUser($uid);
+    if ($sellerApplication === null || $sellerApplication['status'] !== 'approved' || $sellerApplication['didit_status'] !== 'Approved') {
+        flash('info', 'Complete the Didit identity check and receive admin approval before listing a product.');
+        redirect('seller-application.php');
+    }
+}
 $listings = repo(ListingRepository::class);
 $categories = repo(CategoryRepository::class);
 $towns = repo(TownRepository::class);

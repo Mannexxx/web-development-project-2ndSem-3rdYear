@@ -15,6 +15,8 @@
 /** @var array $guidelinesAll */
 /** @var array $activeGuidelines */
 /** @var ?array $editGuideline */
+/** @var array $pendingSellerApplications */
+/** @var ?array $sellerApplication */
 
 $au = static fn(string $t, array $x = []): string => url('admin/index.php?' . http_build_query(['tab' => $t] + $x));
 $tabLinks = [
@@ -22,6 +24,7 @@ $tabLinks = [
     'reports' => 'Reports (' . count($openReports) . ')',
     'support' => 'Customer service (' . count($openTickets) . ')',
     'guidelines' => 'Community guidelines',
+    'sellers' => 'Seller applications (' . count($pendingSellerApplications) . ')',
 ];
 ?>
 <section class="wrap admin-head">
@@ -41,7 +44,55 @@ $tabLinks = [
 
 <section class="wrap admin-grid">
     <div class="admin-main">
-    <?php if ($tab === 'moderation'): ?>
+    <?php if ($tab === 'sellers'): ?>
+        <h2 class="h2">Seller applications awaiting review</h2>
+        <div class="table-head"><span>Applicant</span><span>Identity &amp; Action</span></div>
+        <?php if (!$pendingSellerApplications): ?><p class="muted">No seller applications are waiting for review.</p><?php endif; ?>
+        <?php foreach ($pendingSellerApplications as $p): ?>
+            <div class="row-card<?= $sellerApplication && (int) $sellerApplication['id'] === (int) $p['id'] ? ' selected' : '' ?>">
+                <div><strong><?= e($p['first_name'] . ' ' . ($p['middle_name'] ? $p['middle_name'] . ' ' : '') . $p['last_name']) ?></strong><br>
+                    <span class="small muted"><?= e($p['municipality']) ?> · Didit: <?= e($p['didit_status']) ?></span></div>
+                <div class="row-actions"><span class="small muted"><?= e(ucwords(str_replace('_', ' ', $p['status']))) ?></span>
+                    <a class="btn btn-sm" href="<?= e($au('sellers', ['application' => (int) $p['id']])) ?>">Review</a></div>
+            </div>
+        <?php endforeach; ?>
+
+        <?php if ($sellerApplication): ?>
+            <div class="panel panel-soft top-gap" id="seller-review">
+                <h2 class="h2">Review applicant</h2>
+                <div class="review-facts small">
+                    <p><strong><?= e($sellerApplication['first_name'] . ' ' . ($sellerApplication['middle_name'] ? $sellerApplication['middle_name'] . ' ' : '') . $sellerApplication['last_name']) ?></strong>
+                        · <?= e(ucfirst($sellerApplication['sex'])) ?> · born <?= e($sellerApplication['date_of_birth']) ?></p>
+                    <p>Address: <?= e($sellerApplication['house_number'] . ', ' . $sellerApplication['street_village'] . ', ' . $sellerApplication['barangay'] . ', ' . $sellerApplication['municipality']) ?></p>
+                    <p>Account: <?= e($sellerApplication['email'] ?: $sellerApplication['phone'] ?: $sellerApplication['username']) ?><br>
+                        ID type: <?= e(ucwords(str_replace('_', ' ', $sellerApplication['id_type']))) ?><br>
+                        Didit status: <strong><?= e($sellerApplication['didit_status']) ?></strong></p>
+                    <div class="btn-row">
+                        <?php foreach (['front' => 'Front of ID', 'back' => 'Back of ID'] as $side => $label): ?>
+                            <?php if (!empty($sellerApplication['id_' . $side . '_path'])): ?>
+                                <a class="btn btn-sm" target="_blank" rel="noopener" href="<?= e(url('admin/seller-document.php?id=' . (int) $sellerApplication['id'] . '&side=' . $side)) ?>"><?= e($label) ?></a>
+                            <?php else: ?><span class="bad"><?= e($label) ?> unavailable (retention expired)</span><?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                    <p class="muted">Terms, privacy, guidelines, and biometric consent recorded at <?= e($sellerApplication['biometric_consent_at']) ?>. ID images are scheduled for deletion 30 days after a final decision.</p>
+                </div>
+                <?php if (in_array($sellerApplication['status'], ['pending', 'changes_requested'], true)): ?>
+                    <form method="post" action="<?= e(url('admin/index.php')) ?>" class="form">
+                        <?= csrf_field() ?><input type="hidden" name="action" value="seller_decision"><input type="hidden" name="tab" value="sellers">
+                        <input type="hidden" name="application_id" value="<?= (int) $sellerApplication['id'] ?>">
+                        <div class="field"><label for="seller-note">Decision note</label><input id="seller-note" name="note" maxlength="1000" placeholder="Required when requesting changes or rejecting"></div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" type="submit" name="decision" value="approve"<?= $sellerApplication['didit_status'] !== 'Approved' ? ' disabled' : '' ?> data-confirm-click="Approve this seller application?">Approve seller</button>
+                            <button class="btn" type="submit" name="decision" value="changes" data-confirm-click="Request changes to this seller application?">Request changes</button>
+                            <button class="btn" type="submit" name="decision" value="reject" data-confirm-click="Reject this seller application?">Reject</button>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <p class="muted">Decision: <?= e(ucfirst($sellerApplication['status'])) ?> · <?= e($sellerApplication['review_note'] ?? '') ?></p>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    <?php elseif ($tab === 'moderation'): ?>
         <h2 class="h2">Products awaiting review</h2>
         <div class="table-head"><span>Listing / Seller</span><span>Status &nbsp; Action</span></div>
         <?php if (!$pending): ?><p class="muted">Nothing is waiting for review. Nice work.</p><?php endif; ?>

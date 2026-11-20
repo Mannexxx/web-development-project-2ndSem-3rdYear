@@ -52,6 +52,10 @@ define('SMTP_FROM_NAME', $providerSetting('SMTP_FROM_NAME', 'smtp_from_name', AP
 define('GOOGLE_CLIENT_ID', $providerSetting('GOOGLE_CLIENT_ID', 'google_client_id'));
 define('GOOGLE_CLIENT_SECRET', $providerSetting('GOOGLE_CLIENT_SECRET', 'google_client_secret'));
 define('GOOGLE_REDIRECT_URI', $providerSetting('GOOGLE_REDIRECT_URI', 'google_redirect_uri'));
+define('DIDIT_API_KEY', $providerSetting('DIDIT_API_KEY', 'didit_api_key'));
+define('DIDIT_WORKFLOW_ID', $providerSetting('DIDIT_WORKFLOW_ID', 'didit_workflow_id'));
+define('DIDIT_WEBHOOK_SECRET', $providerSetting('DIDIT_WEBHOOK_SECRET', 'didit_webhook_secret'));
+define('DIDIT_CALLBACK_URL', $providerSetting('DIDIT_CALLBACK_URL', 'didit_callback_url'));
 
 if (is_file(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';

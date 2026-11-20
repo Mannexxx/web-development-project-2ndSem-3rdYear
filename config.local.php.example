@@ -23,4 +23,10 @@ return [
     'google_client_id' => '',
     'google_client_secret' => '',
     'google_redirect_uri' => '',
+    // Didit KYC workflow. Keep the API key and webhook secret private.
+    'didit_api_key' => 'sk_test_K_pDV8N5AiWLfklIlLA7fSRxsKqR8Bg3rkltENXPAWs',
+    'didit_workflow_id' => '7dabdddf-7ca7-4202-9645-3824523f7227',
+    'didit_webhook_secret' => 'QbZExaBK4Y_N62f-AAKxu_b2kExQwTDrD3HS6BVZ6eI',
+    // Public HTTPS callback URL, e.g. https://example.com/marketplace/seller-verification-return.php
+    'didit_callback_url' => 'https://bantayan-marketplace.is-great.net/api/didit-webhook.php',
 ];
