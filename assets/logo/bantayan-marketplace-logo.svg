@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 110" width="440" height="110" role="img" aria-label="Bantayan Marketplace">
+  <defs>
+    <linearGradient id="latte" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a98564"/>
+      <stop offset="1" stop-color="#795739"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="94" height="94" rx="27" fill="#f4ede3" stroke="#ded2c3" stroke-width="2"/>
+  <path d="M25 34H83V54C83 61 77 67 70 67H38C31 67 25 61 25 54V34Z" fill="url(#latte)"/>
+  <path d="M25 34H38V54C38 61 32 67 25 67V34Z" fill="#fffdf9"/>
+  <path d="M38 34H51V54C51 61 45 67 38 67V34Z" fill="#9b7958"/>
+  <path d="M51 34H64V54C64 61 58 67 51 67V34Z" fill="#fffdf9"/>
+  <path d="M64 34H83V54C83 61 77 67 70 67V34Z" fill="#9b7958"/>
+  <rect x="21" y="27" width="66" height="10" rx="5" fill="#6f5038"/>
+  <path d="M34 70V87M74 70V87" fill="none" stroke="#6f5038" stroke-width="5" stroke-linecap="round"/>
+  <rect x="27" y="84" width="54" height="9" rx="4.5" fill="#8a6547"/>
+  <circle cx="54" cy="55" r="7" fill="#fffdf9"/>
+  <path d="M54 49L56 53L60.5 53.5L57.2 56.7L58 61.2L54 59L50 61.2L50.8 56.7L47.5 53.5L52 53Z" fill="#6f5038"/>
+  <text x="122" y="63" fill="#3d3329" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="43" font-weight="750" letter-spacing="-1.8">Bantayan</text>
+  <text x="124" y="88" fill="#8a6547" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="800" letter-spacing="5.8">MARKETPLACE</text>
+</svg>

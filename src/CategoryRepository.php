@@ -2,6 +2,23 @@
 
 declare(strict_types=1);
 
+<<<<<<< HEAD
+namespace App;
+
+use PDO;
+
+final class CategoryRepository
+{
+    public function __construct(private readonly PDO $pdo)
+    {
+    }
+
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->query('SELECT * FROM categories ORDER BY name');
+
+        return $stmt->fetchAll();
+=======
 namespace App\Repository;
 
 final class CategoryRepository extends Repository
@@ -54,5 +71,6 @@ final class CategoryRepository extends Repository
     {
         $rows = $this->all('SELECT id FROM categories WHERE id = ? OR parent_id = ?', [$id, $id]);
         return array_map(static fn($r) => (int) $r['id'], $rows);
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     }
 }

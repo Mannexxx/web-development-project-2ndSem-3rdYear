@@ -1,0 +1,26 @@
+<?php
+
+return [
+    // Replace these with values from your hosting control panel.
+    // For XAMPP, omit config.local.php and use config.php's defaults.
+    'db_host' => '',
+    'db_port' => '3306',
+    'db_name' => '',
+    'db_user' => '',
+    'db_pass' => '',
+    // Set false on any public server.
+    'app_debug' => 'false',
+    'smtp_host' => 'smtp.gmail.com',
+    'smtp_port' => 587,
+    'smtp_username' => '',
+    'smtp_password' => '',
+    'smtp_encryption' => 'tls',
+    'smtp_from_email' => '',
+    'smtp_from_name' => 'Bantayan Marketplace',
+    // Create an OAuth 2.0 Web application in Google Cloud Console.
+    // Authorized redirect URI for this XAMPP install: http://localhost/marketplace/google.php
+    // Use the exact same URI in Google Cloud Console and here.
+    'google_client_id' => '',
+    'google_client_secret' => '',
+    'google_redirect_uri' => '',
+];

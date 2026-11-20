@@ -40,7 +40,11 @@ function sell_footer(): array
     return ['text' => 'Bantayan Marketplace', 'slashes' => true, 'links' => [['Seller guidelines', 'guidelines.php#sellers'], ['Contact admin', 'support.php'], ['Privacy', 'privacy.php']]];
 }
 
+<<<<<<< HEAD
+$editable = $listing === null || in_array($listing['status'], ['draft', 'changes_requested', 'approved'], true);
+=======
 $editable = $listing === null || in_array($listing['status'], ['draft', 'changes_requested'], true);
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 $conditions = ['new', 'like_new', 'used'];
 $leafIds = array_map(static fn($c) => (int) $c['id'], $categories->leaves());
 
@@ -48,6 +52,11 @@ $leafIds = array_map(static fn($c) => (int) $c['id'], $categories->leaves());
 function sell_input(array $post, array $me): array
 {
     $price = parse_price((string) ($post['price'] ?? ''));
+<<<<<<< HEAD
+    $stockRaw = trim((string) ($post['stock'] ?? ''));
+    $stock = preg_match('/^\d{1,7}$/', $stockRaw) ? (int) $stockRaw : null;
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     return [
         'title' => mb_substr(trim((string) ($post['title'] ?? '')), 0, 150),
         'category_id' => (int) ($post['category_id'] ?? 0),
@@ -55,6 +64,11 @@ function sell_input(array $post, array $me): array
         'description' => trim((string) ($post['description'] ?? '')),
         'price_raw' => (string) ($post['price'] ?? ''),
         'price' => $price,
+<<<<<<< HEAD
+        'stock_raw' => $stockRaw,
+        'stock' => $stock !== null && $stock <= 1000000 ? $stock : null,
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         'town_id' => (int) ($post['town_id'] ?? $me['town_id']),
     ];
 }
@@ -68,10 +82,63 @@ if (is_post()) {
         abort(403, 'This listing can no longer be edited.');
     }
     $action = (string) ($_POST['action'] ?? 'save_draft');
+<<<<<<< HEAD
+    $liveEdit = $listing !== null && $listing['status'] === 'approved';
+    if ($liveEdit) {
+        $action = 'submit';
+    }
+    if ($action === 'discard_draft') {
+        if ($listing === null || $listing['status'] !== 'draft') {
+            abort(403, 'Only saved drafts can be discarded.');
+        }
+        try {
+            $discardedPhotos = $listings->discardDraft((int) $listing['id'], $uid);
+        } catch (RuntimeException $e) {
+            flash('error', $e->getMessage());
+            redirect('sell.php');
+        }
+        $uploader = new UploadService();
+        foreach ($discardedPhotos as $photoPath) {
+            $uploader->delete($photoPath);
+        }
+        flash('success', 'Draft discarded.');
+        redirect('sell.php');
+    }
+    $form = sell_input($_POST, $me);
+
+    if (mb_strlen($form['title']) < ($liveEdit ? 5 : 2)) {
+        $errors[] = $liveEdit ? 'The title needs at least 5 characters.' : 'Please enter a product title.';
+    }
+    if ($form['stock'] === null) {
+        $errors[] = 'Enter a whole number of available items from 0 to 1,000,000.';
+    }
+    if ($liveEdit) {
+        if (!in_array($form['category_id'], $leafIds, true)) {
+            $errors[] = 'Choose a category.';
+        }
+        if (!in_array($form['item_condition'], $conditions, true)) {
+            $errors[] = 'Choose the condition.';
+        }
+        if (mb_strlen($form['description']) < 20) {
+            $errors[] = 'Write a description of at least 20 characters. Mention any defects.';
+        }
+        if ($form['price'] === null || $form['price'] <= 0) {
+            $errors[] = 'Enter a selling price greater than zero.';
+        }
+        $removeIds = array_fill_keys(array_map('intval', (array) ($_POST['remove'] ?? [])), true);
+        $keptPhotos = array_filter(
+            $listings->photos((int) $listing['id']),
+            static fn(array $photo): bool => !isset($removeIds[(int) $photo['id']])
+        );
+        if ($keptPhotos === []) {
+            $errors[] = 'Keep at least one existing photo on a live listing.';
+        }
+=======
     $form = sell_input($_POST, $me);
 
     if (mb_strlen($form['title']) < 2) {
         $errors[] = 'Please enter a product title.';
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     }
     if ($errors === []) {
         $townOk = $towns->find($form['town_id']) !== null;
@@ -81,6 +148,10 @@ if (is_post()) {
             'title' => $form['title'],
             'description' => $form['description'],
             'price' => $form['price'] ?? 0,
+<<<<<<< HEAD
+            'stock' => $form['stock'],
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             'item_condition' => in_array($form['item_condition'], $conditions, true) ? $form['item_condition'] : null,
         ];
         $listingId = $listings->save($listing ? (int) $listing['id'] : null, $uid, $data);
@@ -173,7 +244,13 @@ if (is_post()) {
             redirect('sell.php?submitted=' . $listingId);
         }
 
+<<<<<<< HEAD
+        flash('success', $listing !== null && $listing['status'] === 'approved'
+            ? 'Listing updated and sent for admin review.'
+            : 'Draft saved. You can finish it any time from your drafts or account.');
+=======
         flash('success', 'Draft saved. You can finish it any time from your account.');
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         redirect('sell.php?id=' . $listingId);
     }
 }
@@ -187,14 +264,27 @@ if ($form === null) {
         'item_condition' => (string) ($listing['item_condition'] ?? ''),
         'description' => $listing['description'] ?? '',
         'price_raw' => $price > 0 ? rtrim(rtrim(number_format($price, 2, '.', ''), '0'), '.') : '',
+<<<<<<< HEAD
+        'stock_raw' => (string) ($listing['stock'] ?? 1),
+        'stock' => (int) ($listing['stock'] ?? 1),
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         'town_id' => (int) ($listing['town_id'] ?? $me['town_id']),
     ];
 }
 $moderation = $listing && $listing['status'] === 'changes_requested' ? $listings->latestModeration((int) $listing['id']) : null;
+<<<<<<< HEAD
+$drafts = $listings->draftsForSeller($uid);
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 render('sell', [
     'listing' => $listing,
     'editable' => $editable,
+<<<<<<< HEAD
+    'drafts' => $drafts,
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     'photos' => $photos,
     'form' => $form,
     'errors' => $errors,

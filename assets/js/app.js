@@ -2,6 +2,31 @@
 (function () {
   'use strict';
 
+<<<<<<< HEAD
+  var flashContainer = document.querySelector('.flashes');
+  if (flashContainer) {
+    var header = document.querySelector('.admin-header, .site-header, .m-appbar');
+    if (header && header.getClientRects().length) {
+      flashContainer.style.top = (header.getBoundingClientRect().bottom + 8) + 'px';
+    }
+  }
+
+  // Automatically dismiss flash notices after they have been visible for five seconds.
+  document.querySelectorAll('.flash').forEach(function (flash) {
+    window.setTimeout(function () {
+      flash.classList.add('flash-dismissing');
+      window.setTimeout(function () {
+        var container = flash.parentElement;
+        flash.remove();
+        if (container && container.classList.contains('flashes') && !container.querySelector('.flash')) {
+          container.remove();
+        }
+      }, 250);
+    }, 5000);
+  });
+
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   // Filters: submit the form as soon as a select changes.
   document.querySelectorAll('select[data-autosubmit]').forEach(function (sel) {
     sel.addEventListener('change', function () { sel.form && sel.form.submit(); });
@@ -77,4 +102,54 @@
       if (!window.confirm(f.dataset.confirm)) { e.preventDefault(); }
     });
   });
+<<<<<<< HEAD
+
+  // Password visibility controls on auth pages.
+  document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var input = document.getElementById(button.dataset.passwordToggle);
+      if (!input) return;
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.textContent = show ? 'Hide' : 'Show';
+      button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  });
+
+  // Switch between sign-in and registration without leaving the shared auth page.
+  var authLinks = document.querySelectorAll('[data-auth-mode]');
+  var authPanels = document.querySelectorAll('[data-auth-panel]');
+  if (authLinks.length && authPanels.length) {
+    function setAuthMode(mode, targetUrl) {
+      authPanels.forEach(function (panel) {
+        panel.hidden = panel.dataset.authPanel !== mode;
+      });
+      authLinks.forEach(function (link) {
+        if (link.dataset.authMode === mode) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+      document.querySelectorAll('[data-auth-copy]').forEach(function (copy) {
+        copy.textContent = copy.dataset[mode];
+      });
+      var authPage = document.querySelector('[data-auth-login-title]');
+      if (authPage) {
+        document.title = authPage.dataset['auth' + mode.charAt(0).toUpperCase() + mode.slice(1) + 'Title'];
+      }
+      if (targetUrl) {
+        window.history.replaceState(null, '', targetUrl);
+      }
+    }
+
+    authLinks.forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        setAuthMode(link.dataset.authMode, link.href);
+      });
+    });
+  }
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 })();

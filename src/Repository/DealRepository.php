@@ -25,6 +25,18 @@ final class DealRepository extends Repository
         return $this->one('SELECT id, listing_id, buyer_id, seller_id, completed_at FROM deals WHERE listing_id = ?', [$listingId]);
     }
 
+<<<<<<< HEAD
+    public function findByListingBuyer(int $listingId, int $buyerId): ?array
+    {
+        return $this->one(
+            'SELECT id, listing_id, buyer_id, seller_id, completed_at FROM deals
+             WHERE listing_id = ? AND buyer_id = ? ORDER BY completed_at DESC, id DESC LIMIT 1',
+            [$listingId, $buyerId]
+        );
+    }
+
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     /** Deals a user took part in, with the other party and whether the user already rated. */
     public function forUser(int $userId): array
     {
@@ -50,10 +62,35 @@ final class DealRepository extends Repository
 
     public function addReview(int $dealId, int $reviewerId, int $revieweeId, string $reviewerRole, int $rating, ?string $comment): int
     {
+<<<<<<< HEAD
+        $this->db->beginTransaction();
+        try {
+            $reviewId = $this->insert(
+                'INSERT INTO reviews (deal_id, reviewer_id, reviewee_id, reviewer_role, rating, comment, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [$dealId, $reviewerId, $revieweeId, $reviewerRole, $rating, $comment !== '' ? $comment : null, now()]
+            );
+            if ($reviewerRole === 'buyer') {
+                $this->run(
+                    "UPDATE purchases p JOIN deals d ON d.purchase_id = p.id
+                     SET p.status = 'completed'
+                     WHERE d.id = ? AND p.buyer_id = ? AND p.status = 'to_review'",
+                    [$dealId, $reviewerId]
+                );
+            }
+            $this->db->commit();
+            return $reviewId;
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
+=======
         return $this->insert(
             'INSERT INTO reviews (deal_id, reviewer_id, reviewee_id, reviewer_role, rating, comment, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [$dealId, $reviewerId, $revieweeId, $reviewerRole, $rating, $comment !== '' ? $comment : null, now()]
         );
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     }
 
     /**

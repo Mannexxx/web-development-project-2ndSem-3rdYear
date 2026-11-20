@@ -5,14 +5,34 @@
 /** @var array $buyerReviews */
 /** @var array $items */
 
+<<<<<<< HEAD
+=======
 $verified = !empty($seller['face_verified_at']);
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 $sr = $ratings['seller'];
 $br = $ratings['buyer'];
 ?>
 <section class="wrap page-head">
+<<<<<<< HEAD
+    <div class="account-heading">
+        <div class="profile-avatar">
+            <?php if (!empty($seller['profile_pic'])): ?>
+                <img src="<?= e(url((string) $seller['profile_pic'])) ?>" alt="<?= e(full_name($seller)) ?>">
+            <?php else: ?>
+                <span><?= e(mb_strtoupper(mb_substr((string) $seller['firstname'], 0, 1))) ?></span>
+            <?php endif; ?>
+        </div>
+        <div>
+            <p class="eyebrow">MEMBER PROFILE</p>
+            <h1 class="h1"><?= e(full_name($seller)) ?></h1>
+            <p class="lead"><?= e(town_label($seller['town_name'])) ?> · Member since <?= e(date('Y', strtotime((string) $seller['created_at']))) ?></p>
+        </div>
+    </div>
+=======
     <p class="eyebrow">MEMBER PROFILE</p>
     <h1 class="h1"><?= e(full_name($seller)) ?></h1>
     <p class="lead"><?= $verified ? 'Face verified' : 'Not face verified' ?> · <?= e(town_label($seller['town_name'])) ?> · Member since <?= e(date('Y', strtotime((string) $seller['created_at']))) ?></p>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 </section>
 
 <section class="wrap pad-bottom two-col">

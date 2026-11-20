@@ -7,6 +7,10 @@
 /** @var array $leaves */
 /** @var array $towns */
 /** @var ?array $moderation */
+<<<<<<< HEAD
+/** @var array $drafts */
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
 $conditions = ['new', 'like_new', 'used'];
 $empty = max(0, 3 - count($photos));
@@ -29,10 +33,54 @@ $empty = max(0, 3 - count($photos));
     <?php if ($listing && !$editable): ?>
         <div class="flash flash-info">This listing is <?= e(strtolower(listing_status_label($listing['status']))) ?> and can’t be edited. <a class="link" href="<?= e(url('listing.php?id=' . (int) $listing['id'])) ?>">View it</a> or <a class="link" href="<?= e(url('sell.php')) ?>">start a new listing</a>.</div>
     <?php endif; ?>
+<<<<<<< HEAD
+    <?php if ($listing && $listing['status'] === 'approved'): ?>
+        <div class="flash flash-info">Editing a live listing sends it back for admin review and temporarily hides it from buyers.</div>
+    <?php endif; ?>
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     <?php if ($errors): ?>
         <div class="flash flash-error" role="alert"><ul><?php foreach ($errors as $er): ?><li><?= e($er) ?></li><?php endforeach; ?></ul></div>
     <?php endif; ?>
 
+<<<<<<< HEAD
+    <div class="panel top-gap">
+        <div class="panel-head">
+            <h2 class="h2">Your drafts</h2>
+            <span class="small muted"><?= count($drafts) ?> saved</span>
+        </div>
+        <?php if ($drafts === []): ?>
+            <p class="muted">Saved drafts will appear here so you can continue them later.</p>
+        <?php else: ?>
+            <?php foreach ($drafts as $draft): ?>
+                <div class="row-item">
+                    <div class="draft-summary">
+                        <?php if (!empty($draft['cover'])): ?>
+                            <img src="<?= e(url((string) $draft['cover'])) ?>" alt="">
+                        <?php endif; ?>
+                        <div>
+                            <strong><?= e($draft['title'] !== '' ? $draft['title'] : 'Untitled draft') ?></strong><br>
+                            <span class="small muted">
+                                <?= $draft['price'] > 0 ? e(money($draft['price'])) . ' · ' : '' ?>
+                                <?= e(town_label($draft['town_name'])) ?> · Updated <?= e(time_ago($draft['updated_at'])) ?>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <a class="btn btn-sm" href="<?= e(url('sell.php?id=' . (int) $draft['id'])) ?>"><?= (int) ($listing['id'] ?? 0) === (int) $draft['id'] ? 'Continue editing' : 'Resume draft' ?></a>
+                        <form method="post" action="<?= e(url('sell.php')) ?>" class="inline-form" data-confirm="Discard this draft? Its saved details and photos will be permanently deleted.">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="id" value="<?= (int) $draft['id'] ?>">
+                            <button class="btn btn-sm" type="submit" name="action" value="discard_draft">Discard</button>
+                        </form>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     <div class="sell-grid">
         <form class="panel form" id="sell-form" method="post" enctype="multipart/form-data" action="<?= e(url('sell.php')) ?>"
               data-endpoint="<?= e(url('api/ai-listing.php')) ?>" data-listing="<?= (int) ($listing['id'] ?? 0) ?>"
@@ -45,10 +93,18 @@ $empty = max(0, 3 - count($photos));
                 <div class="dropzone">
                     <p class="h3">Add clear photos of your product</p>
                     <p class="small muted">Up to <?= (int) MAX_PHOTOS ?> photos · JPG or PNG · Maximum 5 MB each</p>
+<<<<<<< HEAD
+                    <p class="small muted">Selected photos are saved when you save the draft or submit the listing.</p>
+                    <label class="btn">Upload photos
+                        <input type="file" name="photos[]" id="photo-input" accept="image/jpeg,image/png" multiple hidden>
+                    </label>
+                    <p class="small bad" id="photo-msg" role="status" aria-live="polite" hidden></p>
+=======
                     <label class="btn">Upload photos
                         <input type="file" name="photos[]" id="photo-input" accept="image/jpeg,image/png" multiple hidden>
                     </label>
                     <p class="small bad" id="photo-msg" hidden></p>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                 </div>
 
                 <div class="photo-grid" id="photo-grid">
@@ -75,8 +131,13 @@ $empty = max(0, 3 - count($photos));
                 </div>
 
                 <div class="field">
+<<<<<<< HEAD
+                    <label for="title">Name of your product</label>
+                    <input id="title" name="title" maxlength="150" placeholder="Product name" value="<?= e($form['title']) ?>" required>
+=======
                     <label for="title">Product title</label>
                     <input id="title" name="title" maxlength="150" placeholder="Samsung Galaxy A54 · 128 GB" value="<?= e($form['title']) ?>" required>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                 </div>
                 <div class="field-row">
                     <div class="field">
@@ -108,6 +169,32 @@ $empty = max(0, 3 - count($photos));
                         <input id="price" name="price" inputmode="decimal" placeholder="₱12,500" value="<?= e($form['price_raw']) ?>">
                     </div>
                     <div class="field">
+<<<<<<< HEAD
+                        <label for="stock">Stocks available</label>
+                        <input id="stock" name="stock" type="number" min="0" max="1000000" step="1" value="<?= e($form['stock_raw']) ?>" required>
+                        <span class="small muted">Set to 0 to mark the listing out of stock.</span>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="town_id">Pickup location</label>
+                    <select id="town_id" name="town_id">
+                        <?php foreach ($towns as $t): ?>
+                            <option value="<?= (int) $t['id'] ?>"<?= (int) $form['town_id'] === (int) $t['id'] ? ' selected' : '' ?>><?= e(town_label($t['name'])) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <p class="small muted">Listing rules: Use your own photos, describe defects, and do not post prohibited items.</p>
+                <div class="btn-row">
+                    <?php if ($listing && $listing['status'] === 'approved'): ?>
+                        <button class="btn btn-primary" type="submit" name="action" value="submit" data-confirm-click="Submit these changes for admin review? The live listing will be hidden until reviewed.">Save changes &amp; submit for review</button>
+                    <?php else: ?>
+                        <button class="btn" type="submit" name="action" value="save_draft">Save draft</button>
+                        <button class="btn btn-primary" type="submit" name="action" value="submit" data-confirm-click="Submit this listing for admin review? Any photos marked for removal will also be removed.">Submit for review</button>
+                    <?php endif; ?>
+                    <?php if ($listing && $listing['status'] === 'draft'): ?>
+                        <button class="btn" type="submit" name="action" value="discard_draft" formnovalidate data-confirm-click="Discard this draft? Its saved details and photos will be permanently deleted.">Discard draft</button>
+                    <?php endif; ?>
+=======
                         <label for="town_id">Pickup location</label>
                         <select id="town_id" name="town_id">
                             <?php foreach ($towns as $t): ?>
@@ -120,6 +207,7 @@ $empty = max(0, 3 - count($photos));
                 <div class="btn-row">
                     <button class="btn" type="submit" name="action" value="save_draft">Save draft</button>
                     <button class="btn btn-primary" type="submit" name="action" value="submit" data-confirm-click="Submit this listing for admin review? Any photos marked for removal will also be removed.">Submit for review</button>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                 </div>
             </fieldset>
         </form>

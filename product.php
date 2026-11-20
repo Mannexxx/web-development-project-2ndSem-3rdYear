@@ -1,4 +1,14 @@
 <?php
+<<<<<<< HEAD
+
+declare(strict_types=1);
+
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$id = $id !== false && $id !== null && $id > 0 ? $id : 0;
+
+header('Location: listing.php?id=' . $id, true, 302);
+exit;
+=======
 declare(strict_types=1);
 session_start();
 require_once __DIR__ . '/config.php';
@@ -78,3 +88,4 @@ $isOwner = $product && is_array($viewer) && (int) $viewer['id'] === (int) ($prod
 <script src="assets/js/app.js"></script>
 </body>
 </html>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073

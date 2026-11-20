@@ -1,4 +1,12 @@
 <?php
+<<<<<<< HEAD
+
+declare(strict_types=1);
+
+// Compatibility entry point: the active admin workspace is in admin/index.php.
+require_once __DIR__ . '/config.php';
+redirect('admin/index.php');
+=======
 // Moderation is restricted to accounts whose role is explicitly set to admin.
 declare(strict_types=1);
 session_start();
@@ -80,3 +88,4 @@ $reports = $pdo->query("SELECT r.*,p.title FROM reports r LEFT JOIN products p O
 
     <script src="assets/js/app.js"></script>
 </html>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073

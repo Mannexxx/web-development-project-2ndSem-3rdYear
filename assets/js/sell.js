@@ -50,15 +50,36 @@
     var picked = Array.prototype.slice.call(input.files);
     var room = maxPhotos - existing - files.length;
     var bad = [];
+<<<<<<< HEAD
+    var accepted = [];
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     picked.forEach(function (f) {
       if (!/^image\/(jpeg|png)$/.test(f.type)) { bad.push(f.name + ' is not a JPG or PNG.'); return; }
       if (f.size > 5 * 1024 * 1024) { bad.push(f.name + ' is larger than 5 MB.'); return; }
       if (room <= 0) { bad.push('Only ' + maxPhotos + ' photos are allowed.'); return; }
+<<<<<<< HEAD
+      accepted.push(f); room--;
+    });
+    if (accepted.length === 0) {
+      msg.hidden = bad.length === 0;
+      msg.textContent = bad.join(' ');
+      syncInput();
+      return;
+    }
+    files = files.concat(accepted);
+    msg.className = 'small bad';
+    msg.hidden = bad.length === 0;
+    msg.textContent = bad.join(' ');
+    syncInput();
+    renderNew();
+=======
       files.push(f); room--;
     });
     msg.hidden = bad.length === 0;
     msg.textContent = bad.join(' ');
     syncInput(); renderNew();
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
   });
   form.querySelectorAll('input[name="remove[]"]').forEach(function (remove) {
     remove.addEventListener('change', function () {

@@ -6,7 +6,11 @@ namespace App\Repository;
 
 final class ListingRepository extends Repository
 {
+<<<<<<< HEAD
+    private const LIST_SELECT = "SELECT l.id, l.seller_id, l.category_id, l.town_id, l.title, l.price, l.stock, l.item_condition, l.status,
+=======
     private const LIST_SELECT = "SELECT l.id, l.seller_id, l.category_id, l.town_id, l.title, l.price, l.item_condition, l.status,
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             l.published_at, l.created_at, l.updated_at,
             t.name AS town_name, c.name AS category_name, c.slug AS category_slug, c.parent_id AS category_parent_id,
             u.firstname AS seller_firstname, u.lastname AS seller_lastname,
@@ -18,7 +22,16 @@ final class ListingRepository extends Repository
             JOIN users u ON u.id = l.seller_id
             JOIN towns t ON t.id = l.town_id
             LEFT JOIN categories c ON c.id = l.category_id
+<<<<<<< HEAD
+            LEFT JOIN (
+                SELECT reviewee_id, COUNT(*) AS review_count, ROUND(AVG(rating), 1) AS avg_rating
+                FROM reviews
+                WHERE reviewer_role = 'buyer'
+                GROUP BY reviewee_id
+            ) r ON r.reviewee_id = u.id";
+=======
             LEFT JOIN v_user_ratings r ON r.user_id = u.id AND r.as_role = 'seller'";
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
 
     /* ---- browsing --------------------------------------------------------- */
 
@@ -53,7 +66,11 @@ final class ListingRepository extends Repository
 
     private function buildWhere(array $f): array
     {
+<<<<<<< HEAD
+        $where = ['l.status = ?', 'l.stock > 0'];
+=======
         $where = ['l.status = ?'];
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         $params = [$f['status'] ?? 'approved'];
 
         $q = trim((string) ($f['q'] ?? ''));
@@ -173,6 +190,54 @@ final class ListingRepository extends Repository
         );
     }
 
+<<<<<<< HEAD
+    /** @return array<int, array<string, mixed>> */
+    public function draftsForSeller(int $sellerId): array
+    {
+        return $this->all(
+            "SELECT l.id, l.title, l.price, l.updated_at, t.name AS town_name,
+                    (SELECT p.file_path FROM listing_photos p WHERE p.listing_id = l.id ORDER BY p.sort_order, p.id LIMIT 1) AS cover
+             FROM listings l
+             JOIN towns t ON t.id = l.town_id
+             WHERE l.seller_id = ? AND l.status = 'draft'
+             ORDER BY l.updated_at DESC, l.id DESC",
+            [$sellerId]
+        );
+    }
+
+    /** Deletes one seller-owned draft and returns its uploaded photo paths. */
+    public function discardDraft(int $listingId, int $sellerId): array
+    {
+        $this->db->beginTransaction();
+        try {
+            $draft = $this->one(
+                "SELECT id FROM listings WHERE id = ? AND seller_id = ? AND status = 'draft' FOR UPDATE",
+                [$listingId, $sellerId]
+            );
+            if ($draft === null) {
+                throw new \RuntimeException('This draft no longer exists or cannot be discarded.');
+            }
+
+            $photos = array_column(
+                $this->all('SELECT file_path FROM listing_photos WHERE listing_id = ?', [$listingId]),
+                'file_path'
+            );
+            $this->run(
+                "DELETE FROM listings WHERE id = ? AND seller_id = ? AND status = 'draft'",
+                [$listingId, $sellerId]
+            );
+            $this->db->commit();
+            return $photos;
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $e;
+        }
+    }
+
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
     /** Creates (id = null) or updates a draft/edit. Returns the listing id. */
     public function save(?int $id, int $sellerId, array $d): int
     {
@@ -182,19 +247,36 @@ final class ListingRepository extends Repository
             $d['title'],
             $d['description'],
             $d['price'],
+<<<<<<< HEAD
+            $d['stock'],
+=======
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             $d['item_condition'] ?: null,
         ];
         if ($id === null) {
             return $this->insert(
+<<<<<<< HEAD
+                "INSERT INTO listings (category_id, town_id, title, description, price, stock, item_condition, seller_id, status)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'draft')",
+=======
                 "INSERT INTO listings (category_id, town_id, title, description, price, item_condition, seller_id, status)
                  VALUES (?, ?, ?, ?, ?, ?, ?, 'draft')",
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
                 [...$values, $sellerId]
             );
         }
         $this->run(
+<<<<<<< HEAD
+            "UPDATE listings SET category_id = ?, town_id = ?, title = ?, description = ?, price = ?, stock = ?, item_condition = ?,
+             submitted_at = CASE WHEN status = 'approved' THEN ? ELSE submitted_at END,
+             status = CASE WHEN status = 'approved' THEN 'pending' ELSE status END
+             WHERE id = ? AND seller_id = ?",
+            [...$values, $d['submitted_at'] ?? now(), $id, $sellerId]
+=======
             'UPDATE listings SET category_id = ?, town_id = ?, title = ?, description = ?, price = ?, item_condition = ?
              WHERE id = ? AND seller_id = ?',
             [...$values, $id, $sellerId]
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         );
         return $id;
     }
@@ -212,7 +294,11 @@ final class ListingRepository extends Repository
     public function setStatus(int $id, string $status): void
     {
         if ($status === 'sold') {
+<<<<<<< HEAD
+            $this->run("UPDATE listings SET status = 'sold', stock = 0, sold_at = ? WHERE id = ?", [now(), $id]);
+=======
             $this->run("UPDATE listings SET status = 'sold', sold_at = ? WHERE id = ?", [now(), $id]);
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
             return;
         }
         $this->run('UPDATE listings SET status = ? WHERE id = ?', [$status, $id]);

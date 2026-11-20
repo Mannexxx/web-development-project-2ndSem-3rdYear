@@ -1,6 +1,12 @@
 <header class="admin-header">
     <div class="wrap admin-row">
+<<<<<<< HEAD
+        <a class="admin-brand brand-logo" href="<?= e(url('admin/index.php')) ?>" aria-label="<?= e(APP_NAME) ?>">
+            <img src="<?= e(asset('logo/bantayan-marketplace-logo.svg')) ?>?v=12" alt="" width="440" height="110">
+        </a>
+=======
         <a class="admin-brand" href="<?= e(url('admin.php')) ?>">BANTAYAN MARKETPLACE</a>
+>>>>>>> 730317b9a6c05588ee6649cb65a4921ce2d6c073
         <div class="admin-nav">
             <span class="muted">Admin workspace</span>
             <a class="btn" href="<?= e(url('index.php')) ?>">View marketplace</a>
